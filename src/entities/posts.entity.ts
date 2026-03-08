@@ -16,7 +16,7 @@ export class Posts implements IPosts {
   image_url: string
 
   @Column({ name: 'author_id', type: 'int' })
-  author_id: number
+  author_id?: number
 
   @Column({
     name: 'created_at',
