@@ -31,7 +31,9 @@ export class PostsRepository implements IPostsRepository {
   }
 
   async update(posts: IPosts): Promise<IPosts> {
-    return this.repository.save(posts)
+    const post = await this.findById(posts.id!)
+    const updatedPost = this.repository.merge(post!, posts)
+    return this.repository.save(updatedPost)
   }
 
   async delete(id: number): Promise<void> {
