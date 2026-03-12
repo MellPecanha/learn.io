@@ -1,0 +1,172 @@
+{
+  "info": {
+    "_postman_id": "51c4ebf8-66a0-46b1-b3ad-d39ce49287ce",
+    "name": "learn.io",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "18095850",
+    "_collection_link": "https://go.postman.co/collection/18095850-51c4ebf8-66a0-46b1-b3ad-d39ce49287ce?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "posts",
+      "item": [
+        {
+          "name": "find-all",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/posts?page=1&limit=10",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "posts"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "find",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/posts/1",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "posts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/posts/5",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "posts",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"teste deletar \",\r\n  \"content\": \"teste de deletar posts\",\r\n  \"image_url\": \"https://minhaurl.com.br/imagem\",\r\n  \"author_id\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost}}/posts",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "posts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "update",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{  \r\n  \"title\": \"teste update 2\",\r\n  \"content\": \"teste de update do posts\",\r\n  \"image_url\": \"https://minhaurl.com.br/imagem\",\r\n  \"author_id\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost}}/posts/1",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "posts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "user",
+      "item": [
+        {
+          "name": "create user",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"natan\",\r\n    \"password\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost}}/users",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "localhost",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
