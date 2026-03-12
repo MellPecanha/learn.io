@@ -11,9 +11,4 @@ export class User implements IUser {
 
   @Column({ name: 'password', type: 'varchar' })
   password: string
-
-  constructor(username: string, password: string) {
-    this.username = username
-    this.password = password
-  }
 }
