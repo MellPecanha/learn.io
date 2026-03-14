@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { IUser } from './models/user.interface'
+import { Person } from './person.entity'
 
 @Entity({ name: 'user' })
 export class User implements IUser {
@@ -11,4 +12,7 @@ export class User implements IUser {
 
   @Column({ name: 'password', type: 'varchar' })
   password: string
+
+  @OneToOne(() => Person, (person) => person.user_id)
+  person?: Person
 }
