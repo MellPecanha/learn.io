@@ -25,7 +25,7 @@ export class Person implements IPerson {
   @Column({ name: 'email', type: 'varchar' })
   email: string
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, (user) => user.person)
   @JoinColumn({ name: 'user_id' })
   user_id?: number
 }
