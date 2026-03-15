@@ -1,11 +1,9 @@
 {
   "name": "learn.io",
   "version": "1.0.0",
-  "type": "module",
   "description": "Projeto desenvolvido durante a Pós em Full Stack Development na FIAP.",
-  "main": "src/index.ts",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "tsx watch src/server.ts",
     "build": "tsup src --out-dir build",
     "start": "node build/server.js"
