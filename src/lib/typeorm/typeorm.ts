@@ -3,6 +3,7 @@ import { Posts } from '@/entities/posts.entity'
 import { User } from '@/entities/user.entity'
 import { env } from '@/env'
 import { DataSource } from 'typeorm'
+import { UserAddRole1773452300096 } from './migrations/1773452300096-UserAddRole'
 
 export const appDataSource = new DataSource({
   type: 'postgres',
@@ -12,7 +13,7 @@ export const appDataSource = new DataSource({
   password: env.DATABASE_PASSWORD,
   database: env.DATABASE_NAME,
   entities: [Posts, User, Person],
-  migrations: [],
+  migrations: [UserAddRole1773452300096],
   logging: env.NODE_ENV === 'development',
 })
 
