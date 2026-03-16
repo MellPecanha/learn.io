@@ -1,4 +1,4 @@
-import { makeFindPostsUseCase } from '@/useCases/factory/make-find-posts'
+import { makeFindPostsUseCase } from '@/useCases/factory/make-find-posts-use-case'
 import { FastifyRequest, FastifyReply } from 'fastify'
 import z from 'zod'
 
