@@ -140,7 +140,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"natan\",\r\n    \"password\": \"123456\"\r\n}",
+              "raw": "{\r\n    \"username\": \"natan\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"professor\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -154,6 +154,105 @@
               ],
               "path": [
                 "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/users/2",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "users",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "person",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"cpf\": \"12345678901\",\r\n    \"name\": \"Natan\",\r\n    \"birth\": \"1996-03-11\",\r\n    \"email\": \"teste@gmail.com\",\r\n    \"user_id\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost}}/person",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "person"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "address",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"street\": \"Rua 123\",\r\n    \"city\": \"Sao Paulo\",\r\n    \"state\": \"SP\",\r\n    \"zip_code\": \"123456789\",\r\n    \"person_id\": 2\r\n}    ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost}}/address",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "address"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "address",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/address/person/1",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "address",
+                "person",
+                "1"
               ]
             }
           },

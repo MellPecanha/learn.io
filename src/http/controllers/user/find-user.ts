@@ -1,4 +1,4 @@
-import { makeFindWithPersonUseCase } from '@/useCases/factory/make-find-with-person'
+import { makeFindWithPersonUseCase } from '@/useCases/factory/make-find-with-person-use-case'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 

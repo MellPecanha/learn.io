@@ -5,11 +5,13 @@ import { globalErrorHandler } from './utils/global-error-handler'
 import { postsRoutes } from './http/controllers/posts/routes'
 import { userRoutes } from './http/controllers/user/routes'
 import { personRoutes } from './http/controllers/person/routes'
+import { addressRoutes } from './http/controllers/address/routes'
 
 export const app = fastify()
 
 app.register(postsRoutes)
 app.register(userRoutes)
 app.register(personRoutes)
+app.register(addressRoutes)
 
 app.setErrorHandler(globalErrorHandler)

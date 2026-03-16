@@ -1,4 +1,4 @@
-import { makeDeletePostUseCase } from '@/useCases/factory/make-delete-posts'
+import { makeDeletePostUseCase } from '@/useCases/factory/make-delete-posts-use-case'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
