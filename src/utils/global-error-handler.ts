@@ -27,6 +27,11 @@ export const errorHandlerMap: ErrorHandlerMap = {
       message: error.message,
     })
   },
+  UnauthorizedError: (error, _, reply) => {
+    return reply.status(403).send({
+      message: error.message,
+    })
+  },
 }
 
 export const globalErrorHandler = (

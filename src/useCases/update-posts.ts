@@ -1,11 +1,13 @@
 import { IPosts } from '@/entities/models/posts.interface'
 import { IPostsRepository } from '@/repositories/posts.repository.interface'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { UserRole } from '@/entities/enums/user-role'
+import { UnauthorizedError } from './errors/UnauthorizedError'
 
 export class UpdatePostsUseCase {
   constructor(private postsRepository: IPostsRepository) {}
 
-  async execute(posts: IPosts): Promise<IPosts> {
+  async execute(posts: IPosts, role: string): Promise<IPosts> {
     if (!posts.id) {
       throw new ResourceNotFoundError()
     }
@@ -14,6 +16,10 @@ export class UpdatePostsUseCase {
 
     if (!post) {
       throw new ResourceNotFoundError()
+    }
+
+    if (role !== UserRole.PROFESSOR) {
+      throw new UnauthorizedError()
     }
 
     return this.postsRepository.update(posts)
