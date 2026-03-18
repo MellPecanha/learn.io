@@ -13,7 +13,9 @@ export async function findAllPosts(
 
   const { page, limit } = registerQuerySchema.parse(request.query)
 
+  const user = request.user as { role: string }
+
   const findAllPostsUseCase = makeFindAllPostsUseCase()
-  const posts = await findAllPostsUseCase.execute(page, limit)
+  const posts = await findAllPostsUseCase.execute(page, limit, user.role)
   return reply.status(200).send(posts)
 }

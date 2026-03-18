@@ -24,8 +24,8 @@ __export(user_role_exports, {
 });
 module.exports = __toCommonJS(user_role_exports);
 var UserRole = /* @__PURE__ */ ((UserRole2) => {
-  UserRole2["PROFESSOR"] = "professor";
-  UserRole2["ALUNO"] = "aluno";
+  UserRole2["PROFESSOR"] = "PROFESSOR";
+  UserRole2["ALUNO"] = "ALUNO";
   return UserRole2;
 })(UserRole || {});
 // Annotate the CommonJS export names for ESM import in node:

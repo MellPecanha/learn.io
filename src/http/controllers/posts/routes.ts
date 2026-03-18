@@ -4,9 +4,10 @@ import { createPost } from './create-posts'
 import { findPost } from './find-post'
 import { updatePosts } from './update-posts'
 import { deletePost } from './delete-posts'
+import { validateJwt } from '@/http/middlewares/jwt-validate'
 
 export async function postsRoutes(app: FastifyInstance) {
-  app.get('/posts', findAllPosts)
+  app.get('/posts', { preHandler: [validateJwt] }, findAllPosts)
   app.get('/posts/:id', findPost)
   app.post('/posts', createPost)
   app.put('/posts/:id', updatePosts)
