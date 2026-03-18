@@ -44,15 +44,15 @@ module.exports = __toCommonJS(app_exports);
 var import_reflect_metadata = require("reflect-metadata");
 
 // src/entities/person.entity.ts
-var import_typeorm2 = require("typeorm");
+var import_typeorm3 = require("typeorm");
 
 // src/entities/user.entity.ts
 var import_typeorm = require("typeorm");
 
 // src/entities/enums/user-role.ts
 var UserRole = /* @__PURE__ */ ((UserRole2) => {
-  UserRole2["PROFESSOR"] = "professor";
-  UserRole2["ALUNO"] = "aluno";
+  UserRole2["PROFESSOR"] = "PROFESSOR";
+  UserRole2["ALUNO"] = "ALUNO";
   return UserRole2;
 })(UserRole || {});
 
@@ -73,7 +73,7 @@ __decorateClass([
     name: "role",
     type: "enum",
     enum: UserRole,
-    default: "aluno" /* ALUNO */
+    default: "ALUNO" /* ALUNO */
   })
 ], User.prototype, "role", 2);
 __decorateClass([
@@ -83,67 +83,100 @@ User = __decorateClass([
   (0, import_typeorm.Entity)({ name: "user" })
 ], User);
 
+// src/entities/address.ts
+var import_typeorm2 = require("typeorm");
+var Address = class {
+};
+__decorateClass([
+  (0, import_typeorm2.PrimaryGeneratedColumn)("increment", { name: "id" })
+], Address.prototype, "id", 2);
+__decorateClass([
+  (0, import_typeorm2.Column)({ name: "street", type: "varchar" })
+], Address.prototype, "street", 2);
+__decorateClass([
+  (0, import_typeorm2.Column)({ name: "city", type: "varchar" })
+], Address.prototype, "city", 2);
+__decorateClass([
+  (0, import_typeorm2.Column)({ name: "state", type: "varchar" })
+], Address.prototype, "state", 2);
+__decorateClass([
+  (0, import_typeorm2.Column)({ name: "zip_code", type: "varchar" })
+], Address.prototype, "zip_code", 2);
+__decorateClass([
+  (0, import_typeorm2.Column)({ name: "person_id", type: "int" })
+], Address.prototype, "person_id", 2);
+__decorateClass([
+  (0, import_typeorm2.ManyToOne)(() => Person),
+  (0, import_typeorm2.JoinColumn)({ name: "person_id" })
+], Address.prototype, "person", 2);
+Address = __decorateClass([
+  (0, import_typeorm2.Entity)({ name: "address" })
+], Address);
+
 // src/entities/person.entity.ts
 var Person = class {
 };
 __decorateClass([
-  (0, import_typeorm2.PrimaryGeneratedColumn)("increment", { name: "id" })
+  (0, import_typeorm3.PrimaryGeneratedColumn)("increment", { name: "id" })
 ], Person.prototype, "id", 2);
 __decorateClass([
-  (0, import_typeorm2.Column)({ name: "cpf", type: "varchar" })
+  (0, import_typeorm3.Column)({ name: "cpf", type: "varchar" })
 ], Person.prototype, "cpf", 2);
 __decorateClass([
-  (0, import_typeorm2.Column)({ name: "name", type: "varchar" })
+  (0, import_typeorm3.Column)({ name: "name", type: "varchar" })
 ], Person.prototype, "name", 2);
 __decorateClass([
-  (0, import_typeorm2.Column)({ name: "birth", type: "date" })
+  (0, import_typeorm3.Column)({ name: "birth", type: "date" })
 ], Person.prototype, "birth", 2);
 __decorateClass([
-  (0, import_typeorm2.Column)({ name: "email", type: "varchar" })
+  (0, import_typeorm3.Column)({ name: "email", type: "varchar" })
 ], Person.prototype, "email", 2);
 __decorateClass([
-  (0, import_typeorm2.OneToOne)(() => User, (user) => user.person),
-  (0, import_typeorm2.JoinColumn)({ name: "user_id" })
+  (0, import_typeorm3.OneToOne)(() => User, (user) => user.person),
+  (0, import_typeorm3.JoinColumn)({ name: "user_id" })
 ], Person.prototype, "user_id", 2);
+__decorateClass([
+  (0, import_typeorm3.OneToOne)(() => Address, (address) => address.person)
+], Person.prototype, "address", 2);
 Person = __decorateClass([
-  (0, import_typeorm2.Entity)({ name: "person" })
+  (0, import_typeorm3.Entity)({ name: "person" })
 ], Person);
 
 // src/entities/posts.entity.ts
-var import_typeorm3 = require("typeorm");
+var import_typeorm4 = require("typeorm");
 var Posts = class {
 };
 __decorateClass([
-  (0, import_typeorm3.PrimaryGeneratedColumn)("increment", { name: "id" })
+  (0, import_typeorm4.PrimaryGeneratedColumn)("increment", { name: "id" })
 ], Posts.prototype, "id", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({ name: "title", type: "varchar" })
+  (0, import_typeorm4.Column)({ name: "title", type: "varchar" })
 ], Posts.prototype, "title", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({ name: "content", type: "varchar" })
+  (0, import_typeorm4.Column)({ name: "content", type: "varchar" })
 ], Posts.prototype, "content", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({ name: "image_url", type: "varchar" })
+  (0, import_typeorm4.Column)({ name: "image_url", type: "varchar" })
 ], Posts.prototype, "image_url", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({ name: "author_id", type: "int" })
+  (0, import_typeorm4.Column)({ name: "author_id", type: "int" })
 ], Posts.prototype, "author_id", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({
+  (0, import_typeorm4.Column)({
     name: "created_at",
     type: "timestamp without time zone",
     default: () => "CURRENT_TIMESTAMP"
   })
 ], Posts.prototype, "created_at", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({
+  (0, import_typeorm4.Column)({
     name: "updated_at",
     type: "timestamp without time zone",
     default: () => "CURRENT_TIMESTAMP"
   })
 ], Posts.prototype, "updated_at", 2);
 Posts = __decorateClass([
-  (0, import_typeorm3.Entity)({ name: "posts" })
+  (0, import_typeorm4.Entity)({ name: "posts" })
 ], Posts);
 
 // src/env/index.ts
@@ -156,7 +189,8 @@ var envSchema = import_zod.z.object({
   DATABASE_HOST: import_zod.z.string(),
   DATABASE_NAME: import_zod.z.string(),
   DATABASE_PASSWORD: import_zod.z.string(),
-  DATABASE_PORT: import_zod.z.coerce.number()
+  DATABASE_PORT: import_zod.z.coerce.number(),
+  JWT_SECRET: import_zod.z.string()
 });
 var _env = envSchema.safeParse(process.env);
 if (!_env.success) {
@@ -166,7 +200,7 @@ if (!_env.success) {
 var env = _env.data;
 
 // src/lib/typeorm/typeorm.ts
-var import_typeorm4 = require("typeorm");
+var import_typeorm5 = require("typeorm");
 
 // src/lib/typeorm/migrations/1773452300096-UserAddRole.ts
 var UserAddRole1773452300096 = class {
@@ -185,16 +219,63 @@ var UserAddRole1773452300096 = class {
   }
 };
 
+// src/lib/typeorm/migrations/1773790761895-UpdateUserRoleToUppercase.ts
+var UpdateUserRoleToUppercase1773790761895 = class {
+  async up(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE "user" ALTER COLUMN "role" DROP DEFAULT`
+    );
+    await queryRunner.query(
+      `ALTER TYPE "user_role_enum" RENAME TO "user_role_enum_old"`
+    );
+    await queryRunner.query(
+      `CREATE TYPE "user_role_enum" AS ENUM('PROFESSOR', 'ALUNO')`
+    );
+    await queryRunner.query(`
+            ALTER TABLE "user" 
+            ALTER COLUMN "role" TYPE "user_role_enum" 
+            USING UPPER("role"::text)::user_role_enum
+        `);
+    await queryRunner.query(
+      `ALTER TABLE "user" ALTER COLUMN "role" SET DEFAULT 'ALUNO'`
+    );
+    await queryRunner.query(`DROP TYPE "user_role_enum_old"`);
+  }
+  async down(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE "user" ALTER COLUMN "role" DROP DEFAULT`
+    );
+    await queryRunner.query(
+      `ALTER TYPE "user_role_enum" RENAME TO "user_role_enum_new"`
+    );
+    await queryRunner.query(
+      `CREATE TYPE "user_role_enum" AS ENUM('professor', 'aluno')`
+    );
+    await queryRunner.query(`
+            ALTER TABLE "user" 
+            ALTER COLUMN "role" TYPE "user_role_enum" 
+            USING LOWER("role"::text)::user_role_enum
+        `);
+    await queryRunner.query(
+      `ALTER TABLE "user" ALTER COLUMN "role" SET DEFAULT 'aluno'`
+    );
+    await queryRunner.query(`DROP TYPE "user_role_enum_new"`);
+  }
+};
+
 // src/lib/typeorm/typeorm.ts
-var appDataSource = new import_typeorm4.DataSource({
+var appDataSource = new import_typeorm5.DataSource({
   type: "postgres",
   host: env.DATABASE_HOST,
   port: env.DATABASE_PORT,
   username: env.DATABASE_USER,
   password: env.DATABASE_PASSWORD,
   database: env.DATABASE_NAME,
-  entities: [Posts, User, Person],
-  migrations: [UserAddRole1773452300096],
+  entities: [Posts, User, Person, Address],
+  migrations: [
+    UserAddRole1773452300096,
+    UpdateUserRoleToUppercase1773790761895
+  ],
   logging: env.NODE_ENV === "development"
 });
 appDataSource.initialize().then(() => {
@@ -216,6 +297,11 @@ var errorHandlerMap = {
     });
   },
   ResourceNotFoundError: (error, _, reply) => {
+    return reply.status(404).send({
+      message: error.message
+    });
+  },
+  InvalidCredentialsError: (error, _, reply) => {
     return reply.status(404).send({
       message: error.message
     });
@@ -268,12 +354,16 @@ var FindAllPostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(page, limit) {
+  async execute(page, limit, role) {
+    if (role !== "PROFESSOR" /* PROFESSOR */ && role !== "ALUNO" /* ALUNO */) {
+      console.log(role);
+      throw new Error("Unauthorized");
+    }
     return this.postsRepository.findAll(page, limit);
   }
 };
 
-// src/useCases/factory/make-find-all-posts.ts
+// src/useCases/factory/make-find-all-posts-use-case.ts
 function makeFindAllPostsUseCase() {
   const postsRepository = new PostsRepository();
   const findAllPostsUseCase = new FindAllPostsUseCase(postsRepository);
@@ -288,8 +378,10 @@ async function findAllPosts(request, reply) {
     limit: import_zod3.z.coerce.number().default(10)
   });
   const { page, limit } = registerQuerySchema.parse(request.query);
+  const user = request.user;
+  console.log(user);
   const findAllPostsUseCase = makeFindAllPostsUseCase();
-  const posts = await findAllPostsUseCase.execute(page, limit);
+  const posts = await findAllPostsUseCase.execute(page, limit, user.role);
   return reply.status(200).send(posts);
 }
 
@@ -351,7 +443,7 @@ var FindPostsUseCase = class {
   }
 };
 
-// src/useCases/factory/make-find-posts.ts
+// src/useCases/factory/make-find-posts-use-case.ts
 function makeFindPostsUseCase() {
   const postsRepository = new PostsRepository();
   const findPostsUseCase = new FindPostsUseCase(postsRepository);
@@ -387,7 +479,7 @@ var UpdatePostsUseCase = class {
   }
 };
 
-// src/useCases/factory/make-update-posts.ts
+// src/useCases/factory/make-update-posts-use-case.ts
 function makeUpdatePostsUseCase() {
   const postsRepository = new PostsRepository();
   const updatePostsUseCase = new UpdatePostsUseCase(postsRepository);
@@ -435,7 +527,7 @@ var DeletePostsUseCase = class {
   }
 };
 
-// src/useCases/factory/make-delete-posts.ts
+// src/useCases/factory/make-delete-posts-use-case.ts
 function makeDeletePostUseCase() {
   const postsRepository = new PostsRepository();
   const deletePostsUseCase = new DeletePostsUseCase(postsRepository);
@@ -454,9 +546,21 @@ async function deletePost(req, res) {
   return res.status(204).send();
 }
 
+// src/http/middlewares/jwt-validate.ts
+async function validateJwt(req, reply) {
+  try {
+    const routeFreeList = ["POST-/user", "POST-/user/signin"];
+    const validateRoute = `${req.method}-${req.routeOptions.url}`;
+    if (routeFreeList.includes(validateRoute)) return;
+    await req.jwtVerify();
+  } catch (error) {
+    reply.status(401).send({ message: "Unauthorized" });
+  }
+}
+
 // src/http/controllers/posts/routes.ts
 async function postsRoutes(app2) {
-  app2.get("/posts", findAllPosts);
+  app2.get("/posts", { preHandler: [validateJwt] }, findAllPosts);
   app2.get("/posts/:id", findPost);
   app2.post("/posts", createPost);
   app2.put("/posts/:id", updatePosts);
@@ -478,6 +582,12 @@ var UserRepository = class {
     });
     return user ?? void 0;
   }
+  async findByUsername(username) {
+    const result = await this.repository.findOne({
+      where: { username }
+    });
+    return result ?? void 0;
+  }
 };
 
 // src/useCases/create-user.ts
@@ -498,20 +608,23 @@ function makeCreateUserUseCase() {
 }
 
 // src/http/controllers/user/create.ts
+var import_bcryptjs = require("bcryptjs");
 var import_zod8 = require("zod");
-async function createUserController(req, reply) {
+async function create(req, reply) {
   const registerBodySchema = import_zod8.z.object({
     username: import_zod8.z.string(),
     password: import_zod8.z.string(),
-    role: import_zod8.z.enum(["aluno", "professor"]).default("aluno")
+    role: import_zod8.z.enum(["ALUNO" /* ALUNO */, "PROFESSOR" /* PROFESSOR */]).default("ALUNO" /* ALUNO */).transform((role2) => role2.toUpperCase())
   });
   const { username, password, role } = registerBodySchema.parse(req.body);
+  const hashPassword = await (0, import_bcryptjs.hash)(password, 8);
   const createUserUseCase = makeCreateUserUseCase();
-  const user = await createUserUseCase.execute({
+  const userWithHashPassword = {
     username,
-    password,
+    password: hashPassword,
     role
-  });
+  };
+  const user = await createUserUseCase.execute(userWithHashPassword);
   return reply.status(201).send({ id: user?.id, username: user?.username });
 }
 
@@ -527,7 +640,7 @@ var FindWithPersonUseCase = class {
   }
 };
 
-// src/useCases/factory/make-find-with-person.ts
+// src/useCases/factory/make-find-with-person-use-case.ts
 function makeFindWithPersonUseCase() {
   const userRepository = new UserRepository();
   const findWithPersonUseCase = new FindWithPersonUseCase(userRepository);
@@ -546,10 +659,67 @@ async function findUser(req, reply) {
   return reply.status(200).send(user);
 }
 
+// src/useCases/errors/invalid-credencials-error.ts
+var InvalidCredentialsError = class extends Error {
+  constructor() {
+    super("Username or password invalid");
+  }
+};
+
+// src/useCases/signin.ts
+var SigninUseCase = class {
+  constructor(userRepository) {
+    this.userRepository = userRepository;
+  }
+  async execute(username) {
+    const user = await this.userRepository.findByUsername(username);
+    if (!user) throw new InvalidCredentialsError();
+    return user;
+  }
+};
+
+// src/useCases/factory/make-signin-use-case.ts
+function makeSigninUseCase() {
+  const userRepository = new UserRepository();
+  const signinUseCase = new SigninUseCase(userRepository);
+  return signinUseCase;
+}
+
+// src/http/controllers/user/signin.ts
+var import_bcryptjs2 = require("bcryptjs");
+var import_zod10 = require("zod");
+async function signin(req, reply) {
+  const registerBodySchema = import_zod10.z.object({
+    username: import_zod10.z.string(),
+    password: import_zod10.z.string()
+  });
+  const { username, password } = registerBodySchema.parse(req.body);
+  const signinUseCase = makeSigninUseCase();
+  const user = await signinUseCase.execute(username);
+  const doesPasswordMatch = await (0, import_bcryptjs2.compare)(password, user.password);
+  if (!doesPasswordMatch) {
+    throw new InvalidCredentialsError();
+  }
+  const token = await reply.jwtSign(
+    {
+      role: user.role
+    },
+    {
+      sign: {
+        sub: String(user.id)
+      }
+    }
+  );
+  return reply.status(200).send({
+    token
+  });
+}
+
 // src/http/controllers/user/routes.ts
 async function userRoutes(app2) {
-  app2.post("/users", createUserController);
-  app2.get("/users/:id", findUser);
+  app2.post("/user", create);
+  app2.get("/user/:id", findUser);
+  app2.post("/user/signin", signin);
 }
 
 // src/repositories/typeorm/person.repository.ts
@@ -580,14 +750,14 @@ function makeCreatePersonUseCase() {
 }
 
 // src/http/controllers/person/create-person.ts
-var import_zod10 = require("zod");
-async function create(req, reply) {
-  const registerBodySchema = import_zod10.z.object({
-    cpf: import_zod10.z.string(),
-    name: import_zod10.z.string(),
-    birth: import_zod10.z.coerce.date(),
-    email: import_zod10.z.string().email(),
-    user_id: import_zod10.z.coerce.number()
+var import_zod11 = require("zod");
+async function create2(req, reply) {
+  const registerBodySchema = import_zod11.z.object({
+    cpf: import_zod11.z.string(),
+    name: import_zod11.z.string(),
+    birth: import_zod11.z.coerce.date(),
+    email: import_zod11.z.string().email(),
+    user_id: import_zod11.z.coerce.number()
   });
   const { cpf, name, birth, email, user_id } = registerBodySchema.parse(
     req.body
@@ -605,14 +775,142 @@ async function create(req, reply) {
 
 // src/http/controllers/person/routes.ts
 async function personRoutes(app2) {
-  app2.post("/person", create);
+  app2.post("/person", create2);
+}
+
+// src/repositories/typeorm/address.repository.ts
+var AddressRepository = class {
+  constructor() {
+    this.repository = appDataSource.getRepository(Address);
+  }
+  async findAddressByPersonId(personId, page, limit) {
+    const address = await this.repository.find({
+      relations: ["person"],
+      where: { person: { id: personId } },
+      skip: (page - 1) * limit,
+      take: limit
+    });
+    return address.map((addr) => {
+      const { person, ...addressData } = addr;
+      return {
+        ...addressData,
+        ...person
+      };
+    });
+  }
+  async create(address) {
+    return this.repository.save(address);
+  }
+};
+
+// src/useCases/create-address.ts
+var CreateAddressUseCase = class {
+  constructor(addressRepository) {
+    this.addressRepository = addressRepository;
+  }
+  async execute(address) {
+    if (!address.person) throw new ResourceNotFoundError();
+    return this.addressRepository.create(address);
+  }
+};
+
+// src/useCases/factory/make-create-address-use-case.ts
+function makeCreateAddressUseCase() {
+  const addressRepository = new AddressRepository();
+  const createAddressUseCase = new CreateAddressUseCase(addressRepository);
+  return createAddressUseCase;
+}
+
+// src/http/controllers/address/create.ts
+var import_zod12 = require("zod");
+async function create3(request, reply) {
+  const registerBodySchema = import_zod12.z.object({
+    street: import_zod12.z.string(),
+    city: import_zod12.z.string(),
+    state: import_zod12.z.string(),
+    zip_code: import_zod12.z.string(),
+    person_id: import_zod12.z.coerce.number()
+  });
+  const { street, city, state, zip_code, person_id } = registerBodySchema.parse(
+    request.body
+  );
+  const createAddressUseCase = makeCreateAddressUseCase();
+  const address = await createAddressUseCase.execute({
+    street,
+    city,
+    state,
+    zip_code,
+    person_id
+  });
+  reply.status(201).send(address);
+}
+
+// src/useCases/find-address-by-person.ts
+var FindAddressByPersonUseCase = class {
+  constructor(addressRepository) {
+    this.addressRepository = addressRepository;
+  }
+  async execute(person_id, page, limit) {
+    const addresses = await this.addressRepository.findAddressByPersonId(
+      person_id,
+      page,
+      limit
+    );
+    if (!addresses) throw new ResourceNotFoundError();
+    return addresses;
+  }
+};
+
+// src/useCases/factory/make-find-address-by-person-use-case.ts
+function makeFindAddressByPersonUseCase() {
+  const addressRepository = new AddressRepository();
+  const findAddressByPersonUseCase = new FindAddressByPersonUseCase(
+    addressRepository
+  );
+  return findAddressByPersonUseCase;
+}
+
+// src/http/controllers/address/find-address.ts
+var import_zod13 = require("zod");
+async function findAddress(request, reply) {
+  const registerParamsSchema = import_zod13.z.object({
+    personId: import_zod13.z.coerce.number()
+  });
+  const registerQuerySchema = import_zod13.z.object({
+    page: import_zod13.z.coerce.number().default(1),
+    limit: import_zod13.z.coerce.number().default(10)
+  });
+  const { personId } = registerParamsSchema.parse(request.params);
+  const { page = 1, limit = 10 } = registerQuerySchema.parse(request.query);
+  const findAddressByPersonIdUseCase = makeFindAddressByPersonUseCase();
+  const address = await findAddressByPersonIdUseCase.execute(
+    personId,
+    page,
+    limit
+  );
+  return reply.status(200).send(address);
+}
+
+// src/http/controllers/address/routes.ts
+async function addressRoutes(app2) {
+  app2.post("/address", create3);
+  app2.get("/address/person/:personId", findAddress);
 }
 
 // src/app.ts
+var import_jwt = __toESM(require("@fastify/jwt"));
 var app = (0, import_fastify.default)();
+app.register(import_jwt.default, {
+  secret: env.JWT_SECRET,
+  sign: {
+    expiresIn: "1h"
+  }
+});
+app.addHook("preHandler", validateJwt);
 app.register(postsRoutes);
 app.register(userRoutes);
 app.register(personRoutes);
+app.register(addressRoutes);
 app.setErrorHandler(globalErrorHandler);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

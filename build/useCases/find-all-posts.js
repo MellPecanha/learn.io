@@ -27,7 +27,11 @@ var FindAllPostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(page, limit) {
+  async execute(page, limit, role) {
+    if (role !== "PROFESSOR" /* PROFESSOR */ && role !== "ALUNO" /* ALUNO */) {
+      console.log(role);
+      throw new Error("Unauthorized");
+    }
     return this.postsRepository.findAll(page, limit);
   }
 };

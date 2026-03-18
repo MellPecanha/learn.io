@@ -5,6 +5,7 @@ import { env } from '@/env'
 import { DataSource } from 'typeorm'
 import { UserAddRole1773452300096 } from './migrations/1773452300096-UserAddRole'
 import { Address } from '@/entities/address'
+import { UpdateUserRoleToUppercase1773790761895 } from './migrations/1773790761895-UpdateUserRoleToUppercase'
 
 export const appDataSource = new DataSource({
   type: 'postgres',
@@ -14,7 +15,10 @@ export const appDataSource = new DataSource({
   password: env.DATABASE_PASSWORD,
   database: env.DATABASE_NAME,
   entities: [Posts, User, Person, Address],
-  migrations: [UserAddRole1773452300096],
+  migrations: [
+    UserAddRole1773452300096,
+    UpdateUserRoleToUppercase1773790761895,
+  ],
   logging: env.NODE_ENV === 'development',
 })
 
