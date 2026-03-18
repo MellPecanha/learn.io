@@ -1,7 +1,7 @@
 import { IPosts } from '@/entities/models/posts.interface'
 import { IPostsRepository } from '../posts.repository.interface'
 import { Posts } from '@/entities/posts.entity'
-import { Repository } from 'typeorm'
+import { ILike, Repository } from 'typeorm'
 import { appDataSource } from '@/lib/typeorm/typeorm'
 
 export class PostsRepository implements IPostsRepository {
@@ -23,6 +23,15 @@ export class PostsRepository implements IPostsRepository {
       where: {
         id,
       },
+    })
+  }
+
+  async search(query: string): Promise<IPosts[]> {
+    return this.repository.find({
+      where: [
+        { title: ILike(`%${query}%`) }, // Busca no título
+        { content: ILike(`%${query}%`) }, // Busca no conteúdo
+      ],
     })
   }
 

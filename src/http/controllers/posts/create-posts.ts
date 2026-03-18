@@ -14,14 +14,19 @@ export async function createPost(request: FastifyRequest, reply: FastifyReply) {
     request.body,
   )
 
+  const user = request.user as { role: string }
+
   const createPostUseCase = makeCreatePostsUseCase()
 
-  const post = await createPostUseCase.execute({
-    title,
-    content,
-    image_url,
-    author_id,
-  })
+  const post = await createPostUseCase.execute(
+    {
+      title,
+      content,
+      image_url,
+      author_id,
+    },
+    user.role,
+  )
 
   return reply.status(201).send(post)
 }

@@ -1,15 +1,20 @@
 import { UserRole } from '@/entities/enums/user-role'
-import { IPosts } from '@/entities/models/posts.interface'
 import { IPostsRepository } from '@/repositories/posts.repository.interface'
 import { UnauthorizedError } from './errors/UnauthorizedError'
 
-export class CreatePostsUseCase {
+export class SearchPostsUseCase {
   constructor(private postsRepository: IPostsRepository) {}
 
-  async execute(posts: IPosts, role: string): Promise<IPosts> {
-    if (role !== UserRole.PROFESSOR) {
+  async execute(query: string, role: string) {
+    if (!query) {
+      return []
+    }
+
+    if (role !== UserRole.PROFESSOR && role !== UserRole.ALUNO) {
       throw new UnauthorizedError()
     }
-    return this.postsRepository.create(posts)
+
+    const posts = await this.postsRepository.search(query)
+    return posts
   }
 }

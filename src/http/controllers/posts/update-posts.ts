@@ -23,15 +23,20 @@ export async function updatePosts(
     request.body,
   )
 
+  const user = request.user as { role: string }
+
   const updatePostsUseCase = makeUpdatePostsUseCase()
 
-  const posts = await updatePostsUseCase.execute({
-    id,
-    title,
-    content,
-    image_url,
-    author_id,
-  })
+  const posts = await updatePostsUseCase.execute(
+    {
+      id,
+      title,
+      content,
+      image_url,
+      author_id,
+    },
+    user.role,
+  )
 
   return reply.status(200).send(posts)
 }
