@@ -9,8 +9,36 @@ import { addressRoutes } from './http/controllers/address/routes'
 import fastifyJwt from '@fastify/jwt'
 import { env } from './env'
 import { validateJwt } from './http/middlewares/jwt-validate'
+import fastifySwagger from '@fastify/swagger'
+import fastifySwaggerUi from '@fastify/swagger-ui'
 
 export const app = fastify()
+
+app.register(fastifySwagger, {
+  swagger: {
+    info: {
+      title: 'Learn-io',
+      description: 'API para gerenciamento de cursos e posts no Learn-io',
+      version: '1.0.0',
+    },
+    host: 'localhost:3000',
+    schemes: ['http'],
+    consumes: ['application/json'],
+    produces: ['application/json'],
+    securityDefinitions: {
+      bearerAuth: {
+        type: 'apiKey',
+        name: 'Authorization',
+        in: 'header',
+        description: 'Digite o token no formato: Bearer [token]',
+      },
+    },
+  },
+})
+
+app.register(fastifySwaggerUi, {
+  routePrefix: '/docs',
+})
 
 app.register(fastifyJwt, {
   secret: env.JWT_SECRET,

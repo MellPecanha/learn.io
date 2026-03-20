@@ -13,6 +13,16 @@
         {
           "name": "find-all",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiUFJPRkVTU09SIiwic3ViIjoiNiIsImlhdCI6MTc3MzgzOTQyMCwiZXhwIjoxNzczODQzMDIwfQ.c4icu3HRA4nTF_DE-1KkixknE_gPnR8mIXzuziA_-xw",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -26,13 +36,44 @@
               "query": [
                 {
                   "key": "page",
-                  "value": "1",
-                  "type": "text"
+                  "value": "1"
                 },
                 {
                   "key": "limit",
-                  "value": "10",
-                  "type": "text"
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "search",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5hdGFuX2FsdW5vQGdtYWlsLmNvbSIsImlhdCI6MTc3Mzc4OTQzMCwiZXhwIjoxNzczNzkzMDMwfQ.qi9srOLvXPMWx53eX2Zwr70RiqxTgFW0nve98yyIdbM",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/posts?q=teste",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "posts"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "teste"
                 }
               ]
             }
@@ -42,6 +83,16 @@
         {
           "name": "find",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiUFJPRkVTU09SIiwic3ViIjoiNiIsImlhdCI6MTc3MzgzOTQyMCwiZXhwIjoxNzczODQzMDIwfQ.c4icu3HRA4nTF_DE-1KkixknE_gPnR8mIXzuziA_-xw",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -60,16 +111,26 @@
         {
           "name": "delete",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiUFJPRkVTU09SIiwic3ViIjoiNiIsImlhdCI6MTc3Mzg1OTM0MywiZXhwIjoxNzczODYyOTQzfQ.-mQ8d7h98Xx1P9pJ95iO1HDm_05ZfAXNwti_iEBQLB8",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{localhost}}/posts/5",
+              "raw": "{{localhost}}/posts/6",
               "host": [
                 "{{localhost}}"
               ],
               "path": [
                 "posts",
-                "5"
+                "6"
               ]
             }
           },
@@ -78,11 +139,21 @@
         {
           "name": "create",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiQUxVTk8iLCJzdWIiOiI0IiwiaWF0IjoxNzczODQwODM2LCJleHAiOjE3NzM4NDQ0MzZ9.lXyyPXqlIobnrv-nTHG3gQ0VPo6GOR0s421U32AjiQw",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"title\": \"teste deletar \",\r\n  \"content\": \"teste de deletar posts\",\r\n  \"image_url\": \"https://minhaurl.com.br/imagem\",\r\n  \"author_id\": 1\r\n}",
+              "raw": "{\r\n  \"title\": \"teste autorizacao com usuario aluno \",\r\n  \"content\": \"teste autorizacao com usuario aluno \",\r\n  \"image_url\": \"https://minhaurl.com.br/imagem\",\r\n  \"author_id\": 4\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -104,11 +175,21 @@
         {
           "name": "update",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiUFJPRkVTU09SIiwic3ViIjoiNiIsImlhdCI6MTc3Mzg0MTMyMywiZXhwIjoxNzczODQ0OTIzfQ.E85LKBFO1YGfXtPorPQST0kysZKVFywvBkCkDKHfyv4",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PUT",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{  \r\n  \"title\": \"teste update 2\",\r\n  \"content\": \"teste de update do posts\",\r\n  \"image_url\": \"https://minhaurl.com.br/imagem\",\r\n  \"author_id\": 1\r\n}",
+              "raw": "{  \r\n  \"title\": \"teste update com autorizacao de aluno\",\r\n  \"content\": \"teste de update do posts\",\r\n  \"image_url\": \"https://minhaurl.com.br/imagem\",\r\n  \"author_id\": 2\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -140,7 +221,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"natan\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"professor\"\r\n}",
+              "raw": "{\r\n    \"username\": \"PROFESSOR@gmail.com\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"PROFESSOR\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -148,12 +229,39 @@
               }
             },
             "url": {
-              "raw": "{{localhost}}/users",
+              "raw": "{{localhost}}/user",
               "host": [
                 "{{localhost}}"
               ],
               "path": [
-                "users"
+                "user"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "signin",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"PROFESSOR@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost}}/user/signin",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "user",
+                "signin"
               ]
             }
           },
@@ -162,15 +270,25 @@
         {
           "name": "user",
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiQUxVTk8iLCJzdWIiOiI0IiwiaWF0IjoxNzczODM5MTU0LCJleHAiOjE3NzM4NDI3NTR9.MM_ykyxBfJsmf-KVCea7Uycdb08vY0Qe_jXKntFeiPI",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{localhost}}/users/2",
+              "raw": "{{localhost}}/user/2",
               "host": [
                 "{{localhost}}"
               ],
               "path": [
-                "users",
+                "user",
                 "2"
               ]
             }
@@ -220,7 +338,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"street\": \"Rua 123\",\r\n    \"city\": \"Sao Paulo\",\r\n    \"state\": \"SP\",\r\n    \"zip_code\": \"123456789\",\r\n    \"person_id\": 2\r\n}    ",
+              "raw": "{\r\n    \"street\": \"Rua 1234\",\r\n    \"city\": \"Pernambuco\",\r\n    \"state\": \"PE\",\r\n    \"zip_code\": \"123456789\",\r\n    \"person_id\": 1\r\n}    ",
               "options": {
                 "raw": {
                   "language": "json"
@@ -245,14 +363,14 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{localhost}}/address/person/1",
+              "raw": "{{localhost}}/address/person/2",
               "host": [
                 "{{localhost}}"
               ],
               "path": [
                 "address",
                 "person",
-                "1"
+                "2"
               ]
             }
           },
