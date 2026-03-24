@@ -2,9 +2,9 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
@@ -13,25 +13,41 @@ jobs:
     env:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      DATABASE_USER: ${{ secrets.DATABASE_USER }}
-      DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-      DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-      DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Build and Push Docker Image
-      run: |
-        docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-        docker build -t $DOCKER_USERNAME/learn.io:latest \
-          --build-arg DATABASE_USER="$DATABASE_USER" \
-          --build-arg DATABASE_HOST="$DATABASE_HOST" \
-          --build-arg DATABASE_NAME="$DATABASE_NAME" \
-          --build-arg DATABASE_PASSWORD="$DATABASE_PASSWORD" \
-          --build-arg DATABASE_PORT="$DATABASE_PORT" \
-          --build-arg JWT_SECRET="$JWT_SECRET" .
-        docker push $DOCKER_USERNAME/learn.io:latest
+      - name: Login no Docker Hub
+        run: |
+          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+      - name: Build da imagem
+        run: |
+          docker build -t $DOCKER_USERNAME/learn.io:latest .
+
+      - name: Run container (teste com env)
+        run: |
+          docker run -d \
+            -p 3000:3000 \
+            -e DATABASE_USER=${{ secrets.DATABASE_USER }} \
+            -e DATABASE_HOST=${{ secrets.DATABASE_HOST }} \
+            -e DATABASE_NAME=${{ secrets.DATABASE_NAME }} \
+            -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+            -e DATABASE_PORT=${{ secrets.DATABASE_PORT }} \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            --name app-test \
+            $DOCKER_USERNAME/learn.io:latest
+
+      - name: Aguarda container subir
+        run: sleep 10
+
+      - name: Logs do container
+        run: docker logs app-test
+
+      - name: Stop container
+        run: docker stop app-test
+
+      - name: Push da imagem
+        run: |
+          docker push $DOCKER_USERNAME/learn.io:latest
