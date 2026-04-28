@@ -79,6 +79,9 @@ Posts = __decorateClass([
   (0, import_typeorm.Entity)({ name: "posts" })
 ], Posts);
 
+// src/repositories/typeorm/posts.repository.ts
+var import_typeorm6 = require("typeorm");
+
 // src/entities/person.entity.ts
 var import_typeorm4 = require("typeorm");
 
@@ -262,6 +265,23 @@ var UpdateUserRoleToUppercase1773790761895 = class {
   }
 };
 
+// src/lib/typeorm/migrations/1777408444519-AlterTablePersonUniqueCpf.ts
+var AlterTablePersonUniqueCpf1777408444519 = class {
+  async up(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person 
+        ADD CONSTRAINT person_unique_cpf UNIQUE (cpf)`
+    );
+  }
+  async down(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person
+        DROP CONSTRAINT IF EXISTS person_unique_cpf
+        `
+    );
+  }
+};
+
 // src/lib/typeorm/typeorm.ts
 var appDataSource = new import_typeorm5.DataSource({
   type: "postgres",
@@ -273,7 +293,8 @@ var appDataSource = new import_typeorm5.DataSource({
   entities: [Posts, User, Person, Address],
   migrations: [
     UserAddRole1773452300096,
-    UpdateUserRoleToUppercase1773790761895
+    UpdateUserRoleToUppercase1773790761895,
+    AlterTablePersonUniqueCpf1777408444519
   ],
   logging: env.NODE_ENV === "development"
 });
@@ -301,6 +322,16 @@ var PostsRepository = class {
       }
     });
   }
+  async search(query) {
+    return this.repository.find({
+      where: [
+        { title: (0, import_typeorm6.ILike)(`%${query}%`) },
+        // Busca no título
+        { content: (0, import_typeorm6.ILike)(`%${query}%`) }
+        // Busca no conteúdo
+      ]
+    });
+  }
   async create(posts) {
     return this.repository.save(posts);
   }
@@ -314,6 +345,13 @@ var PostsRepository = class {
   }
 };
 
+// src/useCases/errors/UnauthorizedError.ts
+var UnauthorizedError = class extends Error {
+  constructor() {
+    super("Unauthorized");
+  }
+};
+
 // src/useCases/find-all-posts.ts
 var FindAllPostsUseCase = class {
   constructor(postsRepository) {
@@ -321,8 +359,7 @@ var FindAllPostsUseCase = class {
   }
   async execute(page, limit, role) {
     if (role !== "PROFESSOR" /* PROFESSOR */ && role !== "ALUNO" /* ALUNO */) {
-      console.log(role);
-      throw new Error("Unauthorized");
+      throw new UnauthorizedError();
     }
     return this.postsRepository.findAll(page, limit);
   }
@@ -344,7 +381,6 @@ async function findAllPosts(request, reply) {
   });
   const { page, limit } = registerQuerySchema.parse(request.query);
   const user = request.user;
-  console.log(user);
   const findAllPostsUseCase = makeFindAllPostsUseCase();
   const posts = await findAllPostsUseCase.execute(page, limit, user.role);
   return reply.status(200).send(posts);
@@ -355,7 +391,10 @@ var CreatePostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(posts) {
+  async execute(posts, role) {
+    if (role !== "PROFESSOR" /* PROFESSOR */) {
+      throw new UnauthorizedError();
+    }
     return this.postsRepository.create(posts);
   }
 };
@@ -379,13 +418,17 @@ async function createPost(request, reply) {
   const { title, content, image_url, author_id } = registerPostBodySchema.parse(
     request.body
   );
+  const user = request.user;
   const createPostUseCase = makeCreatePostsUseCase();
-  const post = await createPostUseCase.execute({
-    title,
-    content,
-    image_url,
-    author_id
-  });
+  const post = await createPostUseCase.execute(
+    {
+      title,
+      content,
+      image_url,
+      author_id
+    },
+    user.role
+  );
   return reply.status(201).send(post);
 }
 
@@ -401,9 +444,12 @@ var FindPostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(id) {
+  async execute(id, role) {
     const post = await this.postsRepository.findById(id);
     if (!post) throw new ResourceNotFoundError();
+    if (role !== "PROFESSOR" /* PROFESSOR */ && role !== "ALUNO" /* ALUNO */) {
+      throw new UnauthorizedError();
+    }
     return post;
   }
 };
@@ -416,14 +462,15 @@ function makeFindPostsUseCase() {
 }
 
 // src/http/controllers/posts/find-post.ts
-var import_zod4 = __toESM(require("zod"));
+var import_zod4 = require("zod");
 async function findPost(request, reply) {
-  const findPostParamsSchema = import_zod4.default.object({
-    id: import_zod4.default.coerce.number()
+  const findPostParamsSchema = import_zod4.z.object({
+    id: import_zod4.z.coerce.number()
   });
   const { id } = findPostParamsSchema.parse(request.params);
+  const user = request.user;
   const findPostUseCase = makeFindPostsUseCase();
-  const post = await findPostUseCase.execute(id);
+  const post = await findPostUseCase.execute(id, user.role);
   return reply.status(200).send(post);
 }
 
@@ -432,13 +479,16 @@ var UpdatePostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(posts) {
+  async execute(posts, role) {
     if (!posts.id) {
       throw new ResourceNotFoundError();
     }
     const post = await this.postsRepository.findById(posts.id);
     if (!post) {
       throw new ResourceNotFoundError();
+    }
+    if (role !== "PROFESSOR" /* PROFESSOR */) {
+      throw new UnauthorizedError();
     }
     return this.postsRepository.update(posts);
   }
@@ -467,14 +517,18 @@ async function updatePosts(request, reply) {
   const { title, content, image_url, author_id } = registerBodySchema.parse(
     request.body
   );
+  const user = request.user;
   const updatePostsUseCase = makeUpdatePostsUseCase();
-  const posts = await updatePostsUseCase.execute({
-    id,
-    title,
-    content,
-    image_url,
-    author_id
-  });
+  const posts = await updatePostsUseCase.execute(
+    {
+      id,
+      title,
+      content,
+      image_url,
+      author_id
+    },
+    user.role
+  );
   return reply.status(200).send(posts);
 }
 
@@ -483,10 +537,13 @@ var DeletePostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(id) {
+  async execute(id, role) {
     const post = await this.postsRepository.findById(id);
     if (!post) {
       throw new ResourceNotFoundError();
+    }
+    if (role !== "PROFESSOR" /* PROFESSOR */) {
+      throw new UnauthorizedError();
     }
     return this.postsRepository.delete(id);
   }
@@ -501,19 +558,21 @@ function makeDeletePostUseCase() {
 
 // src/http/controllers/posts/delete-posts.ts
 var import_zod6 = require("zod");
-async function deletePost(req, res) {
+async function deletePost(req, reply) {
   const registerParamsSchema = import_zod6.z.object({
     id: import_zod6.z.coerce.number()
   });
   const { id } = registerParamsSchema.parse(req.params);
+  const user = req.user;
   const deletepostUseCase = makeDeletePostUseCase();
-  await deletepostUseCase.execute(id);
-  return res.status(204).send();
+  await deletepostUseCase.execute(id, user.role);
+  return reply.status(204).send();
 }
 
 // src/http/middlewares/jwt-validate.ts
 async function validateJwt(req, reply) {
   try {
+    if (req.url.startsWith("/docs")) return;
     const routeFreeList = ["POST-/user", "POST-/user/signin"];
     const validateRoute = `${req.method}-${req.routeOptions.url}`;
     if (routeFreeList.includes(validateRoute)) return;
@@ -523,13 +582,175 @@ async function validateJwt(req, reply) {
   }
 }
 
+// src/useCases/search-posts.ts
+var SearchPostsUseCase = class {
+  constructor(postsRepository) {
+    this.postsRepository = postsRepository;
+  }
+  async execute(query, role) {
+    if (!query) {
+      return [];
+    }
+    if (role !== "PROFESSOR" /* PROFESSOR */ && role !== "ALUNO" /* ALUNO */) {
+      throw new UnauthorizedError();
+    }
+    const posts = await this.postsRepository.search(query);
+    return posts;
+  }
+};
+
+// src/useCases/factory/make-search-posts-use-case.ts
+function makeSearchPostsUseCase() {
+  const postsRepository = new PostsRepository();
+  const searchPostsUseCase = new SearchPostsUseCase(postsRepository);
+  return searchPostsUseCase;
+}
+
+// src/http/controllers/posts/search-posts.ts
+var import_zod7 = require("zod");
+async function searchPosts(req, reply) {
+  const searchQuerySchema = import_zod7.z.object({
+    q: import_zod7.z.string()
+  });
+  const { q } = searchQuerySchema.parse(req.query);
+  const user = req.user;
+  const searchPostsUseCase = makeSearchPostsUseCase();
+  const posts = await searchPostsUseCase.execute(q, user.role);
+  return reply.status(200).send(posts);
+}
+
 // src/http/controllers/posts/routes.ts
 async function postsRoutes(app) {
-  app.get("/posts", { preHandler: [validateJwt] }, findAllPosts);
-  app.get("/posts/:id", findPost);
-  app.post("/posts", createPost);
-  app.put("/posts/:id", updatePosts);
-  app.delete("/posts/:id", deletePost);
+  app.get(
+    "/posts",
+    {
+      preHandler: [validateJwt],
+      schema: {
+        tags: ["Posts"],
+        description: "Lista todos os posts",
+        security: [{ bearerAuth: [] }],
+        response: {
+          200: {
+            description: "Lista de posts retornada com sucesso",
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                id: { type: "string" },
+                title: { type: "string" },
+                content: { type: "string" },
+                created_at: { type: "string", format: "date-time" }
+              }
+            }
+          }
+        }
+      }
+    },
+    findAllPosts
+  );
+  app.get(
+    "/posts/:id",
+    {
+      schema: {
+        tags: ["Posts"],
+        description: "Busca um post pelo ID",
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string" }
+          }
+        },
+        response: {
+          200: {
+            description: "Post encontrado",
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              title: { type: "string" },
+              content: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    findPost
+  );
+  app.get(
+    "/posts/search",
+    {
+      schema: {
+        tags: ["Posts"],
+        description: "Pesquisa posts por t\xEDtulo ou conte\xFAdo",
+        querystring: {
+          type: "object",
+          properties: {
+            query: { type: "string" }
+          }
+        }
+      }
+    },
+    searchPosts
+  );
+  app.post(
+    "/posts",
+    {
+      schema: {
+        tags: ["Posts"],
+        description: "Cria um novo post",
+        security: [{ bearerAuth: [] }],
+        body: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            content: { type: "string" }
+          },
+          required: ["title", "content"]
+        }
+      }
+    },
+    createPost
+  );
+  app.put(
+    "/posts/:id",
+    {
+      schema: {
+        tags: ["Posts"],
+        description: "Atualiza um post existente",
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string" }
+          }
+        },
+        body: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            content: { type: "string" }
+          }
+        }
+      }
+    },
+    updatePosts
+  );
+  app.delete(
+    "/posts/:id",
+    {
+      schema: {
+        tags: ["Posts"],
+        description: "Remove um post",
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string" }
+          }
+        }
+      }
+    },
+    deletePost
+  );
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

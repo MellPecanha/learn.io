@@ -63,6 +63,11 @@ var errorHandlerMap = {
     return reply.status(404).send({
       message: error.message
     });
+  },
+  UnauthorizedError: (error, _, reply) => {
+    return reply.status(403).send({
+      message: error.message
+    });
   }
 };
 var globalErrorHandler = (error, _, reply) => {

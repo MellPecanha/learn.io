@@ -79,6 +79,9 @@ Posts = __decorateClass([
   (0, import_typeorm.Entity)({ name: "posts" })
 ], Posts);
 
+// src/repositories/typeorm/posts.repository.ts
+var import_typeorm6 = require("typeorm");
+
 // src/entities/person.entity.ts
 var import_typeorm4 = require("typeorm");
 
@@ -262,6 +265,23 @@ var UpdateUserRoleToUppercase1773790761895 = class {
   }
 };
 
+// src/lib/typeorm/migrations/1777408444519-AlterTablePersonUniqueCpf.ts
+var AlterTablePersonUniqueCpf1777408444519 = class {
+  async up(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person 
+        ADD CONSTRAINT person_unique_cpf UNIQUE (cpf)`
+    );
+  }
+  async down(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person
+        DROP CONSTRAINT IF EXISTS person_unique_cpf
+        `
+    );
+  }
+};
+
 // src/lib/typeorm/typeorm.ts
 var appDataSource = new import_typeorm5.DataSource({
   type: "postgres",
@@ -273,7 +293,8 @@ var appDataSource = new import_typeorm5.DataSource({
   entities: [Posts, User, Person, Address],
   migrations: [
     UserAddRole1773452300096,
-    UpdateUserRoleToUppercase1773790761895
+    UpdateUserRoleToUppercase1773790761895,
+    AlterTablePersonUniqueCpf1777408444519
   ],
   logging: env.NODE_ENV === "development"
 });
@@ -301,6 +322,16 @@ var PostsRepository = class {
       }
     });
   }
+  async search(query) {
+    return this.repository.find({
+      where: [
+        { title: (0, import_typeorm6.ILike)(`%${query}%`) },
+        // Busca no título
+        { content: (0, import_typeorm6.ILike)(`%${query}%`) }
+        // Busca no conteúdo
+      ]
+    });
+  }
   async create(posts) {
     return this.repository.save(posts);
   }
@@ -314,12 +345,22 @@ var PostsRepository = class {
   }
 };
 
+// src/useCases/errors/UnauthorizedError.ts
+var UnauthorizedError = class extends Error {
+  constructor() {
+    super("Unauthorized");
+  }
+};
+
 // src/useCases/create-posts.ts
 var CreatePostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(posts) {
+  async execute(posts, role) {
+    if (role !== "PROFESSOR" /* PROFESSOR */) {
+      throw new UnauthorizedError();
+    }
     return this.postsRepository.create(posts);
   }
 };
@@ -343,13 +384,17 @@ async function createPost(request, reply) {
   const { title, content, image_url, author_id } = registerPostBodySchema.parse(
     request.body
   );
+  const user = request.user;
   const createPostUseCase = makeCreatePostsUseCase();
-  const post = await createPostUseCase.execute({
-    title,
-    content,
-    image_url,
-    author_id
-  });
+  const post = await createPostUseCase.execute(
+    {
+      title,
+      content,
+      image_url,
+      author_id
+    },
+    user.role
+  );
   return reply.status(201).send(post);
 }
 // Annotate the CommonJS export names for ESM import in node:

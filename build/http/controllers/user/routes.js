@@ -252,6 +252,23 @@ var UpdateUserRoleToUppercase1773790761895 = class {
   }
 };
 
+// src/lib/typeorm/migrations/1777408444519-AlterTablePersonUniqueCpf.ts
+var AlterTablePersonUniqueCpf1777408444519 = class {
+  async up(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person 
+        ADD CONSTRAINT person_unique_cpf UNIQUE (cpf)`
+    );
+  }
+  async down(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person
+        DROP CONSTRAINT IF EXISTS person_unique_cpf
+        `
+    );
+  }
+};
+
 // src/lib/typeorm/typeorm.ts
 var appDataSource = new import_typeorm5.DataSource({
   type: "postgres",
@@ -263,7 +280,8 @@ var appDataSource = new import_typeorm5.DataSource({
   entities: [Posts, User, Person, Address],
   migrations: [
     UserAddRole1773452300096,
-    UpdateUserRoleToUppercase1773790761895
+    UpdateUserRoleToUppercase1773790761895,
+    AlterTablePersonUniqueCpf1777408444519
   ],
   logging: env.NODE_ENV === "development"
 });
@@ -430,9 +448,90 @@ async function signin(req, reply) {
 
 // src/http/controllers/user/routes.ts
 async function userRoutes(app) {
-  app.post("/user", create);
-  app.get("/user/:id", findUser);
-  app.post("/user/signin", signin);
+  app.post(
+    "/user",
+    {
+      schema: {
+        tags: ["User"],
+        description: "Cria um novo usu\xE1rio",
+        body: {
+          type: "object",
+          properties: {
+            username: { type: "string" },
+            password: { type: "string" },
+            role: { type: "string", enum: ["PROFESSOR", "ALUNO"] }
+          },
+          required: ["usename", "password", "role"]
+        },
+        response: {
+          201: {
+            description: "Usu\xE1rio criado com sucesso",
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              username: { type: "string" },
+              role: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    create
+  );
+  app.get(
+    "/user/:id",
+    {
+      schema: {
+        tags: ["User"],
+        description: "Busca um usu\xE1rio pelo ID",
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string" }
+          }
+        },
+        response: {
+          200: {
+            description: "Usu\xE1rio encontrado",
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              username: { type: "string" },
+              role: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    findUser
+  );
+  app.post(
+    "/user/signin",
+    {
+      schema: {
+        tags: ["User"],
+        description: "Autentica\xE7\xE3o de usu\xE1rio",
+        body: {
+          type: "object",
+          properties: {
+            username: { type: "string" },
+            password: { type: "string" }
+          },
+          required: ["username", "password"]
+        },
+        response: {
+          200: {
+            description: "Login realizado com sucesso",
+            type: "object",
+            properties: {
+              token: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    signin
+  );
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

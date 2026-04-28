@@ -31,15 +31,25 @@ var ResourceNotFoundError = class extends Error {
   }
 };
 
+// src/useCases/errors/UnauthorizedError.ts
+var UnauthorizedError = class extends Error {
+  constructor() {
+    super("Unauthorized");
+  }
+};
+
 // src/useCases/delete-posts.ts
 var DeletePostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(id) {
+  async execute(id, role) {
     const post = await this.postsRepository.findById(id);
     if (!post) {
       throw new ResourceNotFoundError();
+    }
+    if (role !== "PROFESSOR" /* PROFESSOR */) {
+      throw new UnauthorizedError();
     }
     return this.postsRepository.delete(id);
   }

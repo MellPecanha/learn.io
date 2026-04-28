@@ -14,4 +14,8 @@ export class PersonRepository implements IPersonRepository {
   async create(person: IPerson): Promise<IPerson | undefined> {
     return this.repository.save(person)
   }
+
+  async findByCpf(cpf: string): Promise<IPerson | null> {
+    return await this.repository.findOne({ where: { cpf } })
+  }
 }
