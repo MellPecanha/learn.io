@@ -23,14 +23,22 @@ __export(find_all_posts_exports, {
   FindAllPostsUseCase: () => FindAllPostsUseCase
 });
 module.exports = __toCommonJS(find_all_posts_exports);
+
+// src/useCases/errors/UnauthorizedError.ts
+var UnauthorizedError = class extends Error {
+  constructor() {
+    super("Unauthorized");
+  }
+};
+
+// src/useCases/find-all-posts.ts
 var FindAllPostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
   async execute(page, limit, role) {
     if (role !== "PROFESSOR" /* PROFESSOR */ && role !== "ALUNO" /* ALUNO */) {
-      console.log(role);
-      throw new Error("Unauthorized");
+      throw new UnauthorizedError();
     }
     return this.postsRepository.findAll(page, limit);
   }

@@ -23,11 +23,23 @@ __export(create_posts_exports, {
   CreatePostsUseCase: () => CreatePostsUseCase
 });
 module.exports = __toCommonJS(create_posts_exports);
+
+// src/useCases/errors/UnauthorizedError.ts
+var UnauthorizedError = class extends Error {
+  constructor() {
+    super("Unauthorized");
+  }
+};
+
+// src/useCases/create-posts.ts
 var CreatePostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(posts) {
+  async execute(posts, role) {
+    if (role !== "PROFESSOR" /* PROFESSOR */) {
+      throw new UnauthorizedError();
+    }
     return this.postsRepository.create(posts);
   }
 };

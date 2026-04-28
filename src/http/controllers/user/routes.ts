@@ -13,12 +13,11 @@ export async function userRoutes(app: FastifyInstance) {
         body: {
           type: 'object',
           properties: {
-            name: { type: 'string' },
-            email: { type: 'string', format: 'email' },
+            username: { type: 'string' },
             password: { type: 'string' },
             role: { type: 'string', enum: ['PROFESSOR', 'ALUNO'] },
           },
-          required: ['name', 'email', 'password', 'role'],
+          required: ['usename', 'password', 'role'],
         },
         response: {
           201: {
@@ -26,8 +25,7 @@ export async function userRoutes(app: FastifyInstance) {
             type: 'object',
             properties: {
               id: { type: 'string' },
-              name: { type: 'string' },
-              email: { type: 'string' },
+              username: { type: 'string' },
               role: { type: 'string' },
             },
           },
@@ -54,8 +52,7 @@ export async function userRoutes(app: FastifyInstance) {
             type: 'object',
             properties: {
               id: { type: 'string' },
-              name: { type: 'string' },
-              email: { type: 'string' },
+              username: { type: 'string' },
               role: { type: 'string' },
             },
           },
@@ -73,10 +70,10 @@ export async function userRoutes(app: FastifyInstance) {
         body: {
           type: 'object',
           properties: {
-            email: { type: 'string', format: 'email' },
+            username: { type: 'string' },
             password: { type: 'string' },
           },
-          required: ['email', 'password'],
+          required: ['username', 'password'],
         },
         response: {
           200: {

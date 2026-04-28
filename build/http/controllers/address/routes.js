@@ -252,6 +252,23 @@ var UpdateUserRoleToUppercase1773790761895 = class {
   }
 };
 
+// src/lib/typeorm/migrations/1777408444519-AlterTablePersonUniqueCpf.ts
+var AlterTablePersonUniqueCpf1777408444519 = class {
+  async up(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person 
+        ADD CONSTRAINT person_unique_cpf UNIQUE (cpf)`
+    );
+  }
+  async down(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person
+        DROP CONSTRAINT IF EXISTS person_unique_cpf
+        `
+    );
+  }
+};
+
 // src/lib/typeorm/typeorm.ts
 var appDataSource = new import_typeorm5.DataSource({
   type: "postgres",
@@ -263,7 +280,8 @@ var appDataSource = new import_typeorm5.DataSource({
   entities: [Posts, User, Person, Address],
   migrations: [
     UserAddRole1773452300096,
-    UpdateUserRoleToUppercase1773790761895
+    UpdateUserRoleToUppercase1773790761895,
+    AlterTablePersonUniqueCpf1777408444519
   ],
   logging: env.NODE_ENV === "development"
 });
@@ -395,8 +413,70 @@ async function findAddress(request, reply) {
 
 // src/http/controllers/address/routes.ts
 async function addressRoutes(app) {
-  app.post("/address", create);
-  app.get("/address/person/:personId", findAddress);
+  app.post(
+    "/address",
+    {
+      schema: {
+        tags: ["Address"],
+        description: "Cria um novo endere\xE7o para uma pessoa",
+        body: {
+          type: "object",
+          properties: {
+            street: { type: "string" },
+            city: { type: "string" },
+            state: { type: "string", minLength: 2, maxLength: 2 },
+            zip_code: { type: "string" },
+            person_id: { type: "number" }
+          },
+          required: ["street", "city", "state", "zip_code", "person_id"]
+        },
+        response: {
+          201: {
+            description: "Endere\xE7o criado com sucesso",
+            type: "object",
+            properties: {
+              id: { type: "number" },
+              street: { type: "string" },
+              city: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    create
+  );
+  app.get(
+    "/address/person/:personId",
+    {
+      schema: {
+        tags: ["Address"],
+        description: "Busca o endere\xE7o de uma pessoa pelo ID da pessoa",
+        params: {
+          type: "object",
+          properties: {
+            personId: { type: "string" }
+          }
+        },
+        response: {
+          200: {
+            description: "Endere\xE7o encontrado",
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                id: { type: "number" },
+                street: { type: "string" },
+                city: { type: "string" },
+                state: { type: "string" },
+                zip_code: { type: "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    findAddress
+  );
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

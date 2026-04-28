@@ -1,9 +1,7 @@
 "use strict";
-var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -17,14 +15,6 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var __decorateClass = (decorators, target, key, kind) => {
   var result = kind > 1 ? void 0 : kind ? __getOwnPropDesc(target, key) : target;
@@ -78,6 +68,9 @@ __decorateClass([
 Posts = __decorateClass([
   (0, import_typeorm.Entity)({ name: "posts" })
 ], Posts);
+
+// src/repositories/typeorm/posts.repository.ts
+var import_typeorm6 = require("typeorm");
 
 // src/entities/person.entity.ts
 var import_typeorm4 = require("typeorm");
@@ -262,6 +255,23 @@ var UpdateUserRoleToUppercase1773790761895 = class {
   }
 };
 
+// src/lib/typeorm/migrations/1777408444519-AlterTablePersonUniqueCpf.ts
+var AlterTablePersonUniqueCpf1777408444519 = class {
+  async up(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person 
+        ADD CONSTRAINT person_unique_cpf UNIQUE (cpf)`
+    );
+  }
+  async down(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person
+        DROP CONSTRAINT IF EXISTS person_unique_cpf
+        `
+    );
+  }
+};
+
 // src/lib/typeorm/typeorm.ts
 var appDataSource = new import_typeorm5.DataSource({
   type: "postgres",
@@ -273,7 +283,8 @@ var appDataSource = new import_typeorm5.DataSource({
   entities: [Posts, User, Person, Address],
   migrations: [
     UserAddRole1773452300096,
-    UpdateUserRoleToUppercase1773790761895
+    UpdateUserRoleToUppercase1773790761895,
+    AlterTablePersonUniqueCpf1777408444519
   ],
   logging: env.NODE_ENV === "development"
 });
@@ -301,6 +312,16 @@ var PostsRepository = class {
       }
     });
   }
+  async search(query) {
+    return this.repository.find({
+      where: [
+        { title: (0, import_typeorm6.ILike)(`%${query}%`) },
+        // Busca no título
+        { content: (0, import_typeorm6.ILike)(`%${query}%`) }
+        // Busca no conteúdo
+      ]
+    });
+  }
   async create(posts) {
     return this.repository.save(posts);
   }
@@ -321,14 +342,24 @@ var ResourceNotFoundError = class extends Error {
   }
 };
 
+// src/useCases/errors/UnauthorizedError.ts
+var UnauthorizedError = class extends Error {
+  constructor() {
+    super("Unauthorized");
+  }
+};
+
 // src/useCases/find-posts.ts
 var FindPostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(id) {
+  async execute(id, role) {
     const post = await this.postsRepository.findById(id);
     if (!post) throw new ResourceNotFoundError();
+    if (role !== "PROFESSOR" /* PROFESSOR */ && role !== "ALUNO" /* ALUNO */) {
+      throw new UnauthorizedError();
+    }
     return post;
   }
 };
@@ -341,14 +372,15 @@ function makeFindPostsUseCase() {
 }
 
 // src/http/controllers/posts/find-post.ts
-var import_zod2 = __toESM(require("zod"));
+var import_zod2 = require("zod");
 async function findPost(request, reply) {
-  const findPostParamsSchema = import_zod2.default.object({
-    id: import_zod2.default.coerce.number()
+  const findPostParamsSchema = import_zod2.z.object({
+    id: import_zod2.z.coerce.number()
   });
   const { id } = findPostParamsSchema.parse(request.params);
+  const user = request.user;
   const findPostUseCase = makeFindPostsUseCase();
-  const post = await findPostUseCase.execute(id);
+  const post = await findPostUseCase.execute(id, user.role);
   return reply.status(200).send(post);
 }
 // Annotate the CommonJS export names for ESM import in node:

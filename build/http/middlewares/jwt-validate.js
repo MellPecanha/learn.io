@@ -25,6 +25,7 @@ __export(jwt_validate_exports, {
 module.exports = __toCommonJS(jwt_validate_exports);
 async function validateJwt(req, reply) {
   try {
+    if (req.url.startsWith("/docs")) return;
     const routeFreeList = ["POST-/user", "POST-/user/signin"];
     const validateRoute = `${req.method}-${req.routeOptions.url}`;
     if (routeFreeList.includes(validateRoute)) return;

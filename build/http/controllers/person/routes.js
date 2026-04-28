@@ -252,6 +252,23 @@ var UpdateUserRoleToUppercase1773790761895 = class {
   }
 };
 
+// src/lib/typeorm/migrations/1777408444519-AlterTablePersonUniqueCpf.ts
+var AlterTablePersonUniqueCpf1777408444519 = class {
+  async up(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person 
+        ADD CONSTRAINT person_unique_cpf UNIQUE (cpf)`
+    );
+  }
+  async down(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person
+        DROP CONSTRAINT IF EXISTS person_unique_cpf
+        `
+    );
+  }
+};
+
 // src/lib/typeorm/typeorm.ts
 var appDataSource = new import_typeorm5.DataSource({
   type: "postgres",
@@ -263,7 +280,8 @@ var appDataSource = new import_typeorm5.DataSource({
   entities: [Posts, User, Person, Address],
   migrations: [
     UserAddRole1773452300096,
-    UpdateUserRoleToUppercase1773790761895
+    UpdateUserRoleToUppercase1773790761895,
+    AlterTablePersonUniqueCpf1777408444519
   ],
   logging: env.NODE_ENV === "development"
 });
@@ -326,7 +344,37 @@ async function create(req, reply) {
 
 // src/http/controllers/person/routes.ts
 async function personRoutes(app) {
-  app.post("/person", create);
+  app.post(
+    "/person",
+    {
+      schema: {
+        tags: ["Person"],
+        description: "Criar uma nova pessoa",
+        body: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            email: { type: "string", format: "email" },
+            cpf: { type: "string" },
+            birth_date: { type: "string", format: "date" }
+          },
+          required: ["name", "email"]
+        },
+        response: {
+          201: {
+            description: "Pessoa criada com sucesso",
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              name: { type: "string" },
+              email: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    create
+  );
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

@@ -253,6 +253,23 @@ var UpdateUserRoleToUppercase1773790761895 = class {
   }
 };
 
+// src/lib/typeorm/migrations/1777408444519-AlterTablePersonUniqueCpf.ts
+var AlterTablePersonUniqueCpf1777408444519 = class {
+  async up(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person 
+        ADD CONSTRAINT person_unique_cpf UNIQUE (cpf)`
+    );
+  }
+  async down(queryRunner) {
+    await queryRunner.query(
+      `ALTER TABLE person
+        DROP CONSTRAINT IF EXISTS person_unique_cpf
+        `
+    );
+  }
+};
+
 // src/lib/typeorm/typeorm.ts
 var appDataSource = new import_typeorm5.DataSource({
   type: "postgres",
@@ -264,7 +281,8 @@ var appDataSource = new import_typeorm5.DataSource({
   entities: [Posts, User, Person, Address],
   migrations: [
     UserAddRole1773452300096,
-    UpdateUserRoleToUppercase1773790761895
+    UpdateUserRoleToUppercase1773790761895,
+    AlterTablePersonUniqueCpf1777408444519
   ],
   logging: env.NODE_ENV === "development"
 });
@@ -295,6 +313,11 @@ var errorHandlerMap = {
     return reply.status(404).send({
       message: error.message
     });
+  },
+  UnauthorizedError: (error, _, reply) => {
+    return reply.status(403).send({
+      message: error.message
+    });
   }
 };
 var globalErrorHandler = (error, _, reply) => {
@@ -309,6 +332,7 @@ var globalErrorHandler = (error, _, reply) => {
 };
 
 // src/repositories/typeorm/posts.repository.ts
+var import_typeorm6 = require("typeorm");
 var PostsRepository = class {
   constructor() {
     this.repository = appDataSource.getRepository(Posts);
@@ -326,6 +350,16 @@ var PostsRepository = class {
       }
     });
   }
+  async search(query) {
+    return this.repository.find({
+      where: [
+        { title: (0, import_typeorm6.ILike)(`%${query}%`) },
+        // Busca no título
+        { content: (0, import_typeorm6.ILike)(`%${query}%`) }
+        // Busca no conteúdo
+      ]
+    });
+  }
   async create(posts) {
     return this.repository.save(posts);
   }
@@ -339,6 +373,13 @@ var PostsRepository = class {
   }
 };
 
+// src/useCases/errors/UnauthorizedError.ts
+var UnauthorizedError = class extends Error {
+  constructor() {
+    super("Unauthorized");
+  }
+};
+
 // src/useCases/find-all-posts.ts
 var FindAllPostsUseCase = class {
   constructor(postsRepository) {
@@ -346,8 +387,7 @@ var FindAllPostsUseCase = class {
   }
   async execute(page, limit, role) {
     if (role !== "PROFESSOR" /* PROFESSOR */ && role !== "ALUNO" /* ALUNO */) {
-      console.log(role);
-      throw new Error("Unauthorized");
+      throw new UnauthorizedError();
     }
     return this.postsRepository.findAll(page, limit);
   }
@@ -369,7 +409,6 @@ async function findAllPosts(request, reply) {
   });
   const { page, limit } = registerQuerySchema.parse(request.query);
   const user = request.user;
-  console.log(user);
   const findAllPostsUseCase = makeFindAllPostsUseCase();
   const posts = await findAllPostsUseCase.execute(page, limit, user.role);
   return reply.status(200).send(posts);
@@ -380,7 +419,10 @@ var CreatePostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(posts) {
+  async execute(posts, role) {
+    if (role !== "PROFESSOR" /* PROFESSOR */) {
+      throw new UnauthorizedError();
+    }
     return this.postsRepository.create(posts);
   }
 };
@@ -404,13 +446,17 @@ async function createPost(request, reply) {
   const { title, content, image_url, author_id } = registerPostBodySchema.parse(
     request.body
   );
+  const user = request.user;
   const createPostUseCase = makeCreatePostsUseCase();
-  const post = await createPostUseCase.execute({
-    title,
-    content,
-    image_url,
-    author_id
-  });
+  const post = await createPostUseCase.execute(
+    {
+      title,
+      content,
+      image_url,
+      author_id
+    },
+    user.role
+  );
   return reply.status(201).send(post);
 }
 
@@ -426,9 +472,12 @@ var FindPostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(id) {
+  async execute(id, role) {
     const post = await this.postsRepository.findById(id);
     if (!post) throw new ResourceNotFoundError();
+    if (role !== "PROFESSOR" /* PROFESSOR */ && role !== "ALUNO" /* ALUNO */) {
+      throw new UnauthorizedError();
+    }
     return post;
   }
 };
@@ -441,14 +490,15 @@ function makeFindPostsUseCase() {
 }
 
 // src/http/controllers/posts/find-post.ts
-var import_zod5 = __toESM(require("zod"));
+var import_zod5 = require("zod");
 async function findPost(request, reply) {
-  const findPostParamsSchema = import_zod5.default.object({
-    id: import_zod5.default.coerce.number()
+  const findPostParamsSchema = import_zod5.z.object({
+    id: import_zod5.z.coerce.number()
   });
   const { id } = findPostParamsSchema.parse(request.params);
+  const user = request.user;
   const findPostUseCase = makeFindPostsUseCase();
-  const post = await findPostUseCase.execute(id);
+  const post = await findPostUseCase.execute(id, user.role);
   return reply.status(200).send(post);
 }
 
@@ -457,13 +507,16 @@ var UpdatePostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(posts) {
+  async execute(posts, role) {
     if (!posts.id) {
       throw new ResourceNotFoundError();
     }
     const post = await this.postsRepository.findById(posts.id);
     if (!post) {
       throw new ResourceNotFoundError();
+    }
+    if (role !== "PROFESSOR" /* PROFESSOR */) {
+      throw new UnauthorizedError();
     }
     return this.postsRepository.update(posts);
   }
@@ -492,14 +545,18 @@ async function updatePosts(request, reply) {
   const { title, content, image_url, author_id } = registerBodySchema.parse(
     request.body
   );
+  const user = request.user;
   const updatePostsUseCase = makeUpdatePostsUseCase();
-  const posts = await updatePostsUseCase.execute({
-    id,
-    title,
-    content,
-    image_url,
-    author_id
-  });
+  const posts = await updatePostsUseCase.execute(
+    {
+      id,
+      title,
+      content,
+      image_url,
+      author_id
+    },
+    user.role
+  );
   return reply.status(200).send(posts);
 }
 
@@ -508,10 +565,13 @@ var DeletePostsUseCase = class {
   constructor(postsRepository) {
     this.postsRepository = postsRepository;
   }
-  async execute(id) {
+  async execute(id, role) {
     const post = await this.postsRepository.findById(id);
     if (!post) {
       throw new ResourceNotFoundError();
+    }
+    if (role !== "PROFESSOR" /* PROFESSOR */) {
+      throw new UnauthorizedError();
     }
     return this.postsRepository.delete(id);
   }
@@ -526,19 +586,21 @@ function makeDeletePostUseCase() {
 
 // src/http/controllers/posts/delete-posts.ts
 var import_zod7 = require("zod");
-async function deletePost(req, res) {
+async function deletePost(req, reply) {
   const registerParamsSchema = import_zod7.z.object({
     id: import_zod7.z.coerce.number()
   });
   const { id } = registerParamsSchema.parse(req.params);
+  const user = req.user;
   const deletepostUseCase = makeDeletePostUseCase();
-  await deletepostUseCase.execute(id);
-  return res.status(204).send();
+  await deletepostUseCase.execute(id, user.role);
+  return reply.status(204).send();
 }
 
 // src/http/middlewares/jwt-validate.ts
 async function validateJwt(req, reply) {
   try {
+    if (req.url.startsWith("/docs")) return;
     const routeFreeList = ["POST-/user", "POST-/user/signin"];
     const validateRoute = `${req.method}-${req.routeOptions.url}`;
     if (routeFreeList.includes(validateRoute)) return;
@@ -548,13 +610,175 @@ async function validateJwt(req, reply) {
   }
 }
 
+// src/useCases/search-posts.ts
+var SearchPostsUseCase = class {
+  constructor(postsRepository) {
+    this.postsRepository = postsRepository;
+  }
+  async execute(query, role) {
+    if (!query) {
+      return [];
+    }
+    if (role !== "PROFESSOR" /* PROFESSOR */ && role !== "ALUNO" /* ALUNO */) {
+      throw new UnauthorizedError();
+    }
+    const posts = await this.postsRepository.search(query);
+    return posts;
+  }
+};
+
+// src/useCases/factory/make-search-posts-use-case.ts
+function makeSearchPostsUseCase() {
+  const postsRepository = new PostsRepository();
+  const searchPostsUseCase = new SearchPostsUseCase(postsRepository);
+  return searchPostsUseCase;
+}
+
+// src/http/controllers/posts/search-posts.ts
+var import_zod8 = require("zod");
+async function searchPosts(req, reply) {
+  const searchQuerySchema = import_zod8.z.object({
+    q: import_zod8.z.string()
+  });
+  const { q } = searchQuerySchema.parse(req.query);
+  const user = req.user;
+  const searchPostsUseCase = makeSearchPostsUseCase();
+  const posts = await searchPostsUseCase.execute(q, user.role);
+  return reply.status(200).send(posts);
+}
+
 // src/http/controllers/posts/routes.ts
 async function postsRoutes(app2) {
-  app2.get("/posts", { preHandler: [validateJwt] }, findAllPosts);
-  app2.get("/posts/:id", findPost);
-  app2.post("/posts", createPost);
-  app2.put("/posts/:id", updatePosts);
-  app2.delete("/posts/:id", deletePost);
+  app2.get(
+    "/posts",
+    {
+      preHandler: [validateJwt],
+      schema: {
+        tags: ["Posts"],
+        description: "Lista todos os posts",
+        security: [{ bearerAuth: [] }],
+        response: {
+          200: {
+            description: "Lista de posts retornada com sucesso",
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                id: { type: "string" },
+                title: { type: "string" },
+                content: { type: "string" },
+                created_at: { type: "string", format: "date-time" }
+              }
+            }
+          }
+        }
+      }
+    },
+    findAllPosts
+  );
+  app2.get(
+    "/posts/:id",
+    {
+      schema: {
+        tags: ["Posts"],
+        description: "Busca um post pelo ID",
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string" }
+          }
+        },
+        response: {
+          200: {
+            description: "Post encontrado",
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              title: { type: "string" },
+              content: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    findPost
+  );
+  app2.get(
+    "/posts/search",
+    {
+      schema: {
+        tags: ["Posts"],
+        description: "Pesquisa posts por t\xEDtulo ou conte\xFAdo",
+        querystring: {
+          type: "object",
+          properties: {
+            query: { type: "string" }
+          }
+        }
+      }
+    },
+    searchPosts
+  );
+  app2.post(
+    "/posts",
+    {
+      schema: {
+        tags: ["Posts"],
+        description: "Cria um novo post",
+        security: [{ bearerAuth: [] }],
+        body: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            content: { type: "string" }
+          },
+          required: ["title", "content"]
+        }
+      }
+    },
+    createPost
+  );
+  app2.put(
+    "/posts/:id",
+    {
+      schema: {
+        tags: ["Posts"],
+        description: "Atualiza um post existente",
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string" }
+          }
+        },
+        body: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            content: { type: "string" }
+          }
+        }
+      }
+    },
+    updatePosts
+  );
+  app2.delete(
+    "/posts/:id",
+    {
+      schema: {
+        tags: ["Posts"],
+        description: "Remove um post",
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string" }
+          }
+        }
+      }
+    },
+    deletePost
+  );
 }
 
 // src/repositories/typeorm/user.repository.ts
@@ -599,12 +823,12 @@ function makeCreateUserUseCase() {
 
 // src/http/controllers/user/create.ts
 var import_bcryptjs = require("bcryptjs");
-var import_zod8 = require("zod");
+var import_zod9 = require("zod");
 async function create(req, reply) {
-  const registerBodySchema = import_zod8.z.object({
-    username: import_zod8.z.string(),
-    password: import_zod8.z.string(),
-    role: import_zod8.z.enum(["ALUNO" /* ALUNO */, "PROFESSOR" /* PROFESSOR */]).default("ALUNO" /* ALUNO */).transform((role2) => role2.toUpperCase())
+  const registerBodySchema = import_zod9.z.object({
+    username: import_zod9.z.string(),
+    password: import_zod9.z.string(),
+    role: import_zod9.z.enum(["ALUNO" /* ALUNO */, "PROFESSOR" /* PROFESSOR */]).default("ALUNO" /* ALUNO */).transform((role2) => role2.toUpperCase())
   });
   const { username, password, role } = registerBodySchema.parse(req.body);
   const hashPassword = await (0, import_bcryptjs.hash)(password, 8);
@@ -638,10 +862,10 @@ function makeFindWithPersonUseCase() {
 }
 
 // src/http/controllers/user/find-user.ts
-var import_zod9 = require("zod");
+var import_zod10 = require("zod");
 async function findUser(req, reply) {
-  const registerParamsSchema = import_zod9.z.object({
-    id: import_zod9.z.coerce.number()
+  const registerParamsSchema = import_zod10.z.object({
+    id: import_zod10.z.coerce.number()
   });
   const { id } = registerParamsSchema.parse(req.params);
   const findWithPersonUseCase = makeFindWithPersonUseCase();
@@ -677,11 +901,11 @@ function makeSigninUseCase() {
 
 // src/http/controllers/user/signin.ts
 var import_bcryptjs2 = require("bcryptjs");
-var import_zod10 = require("zod");
+var import_zod11 = require("zod");
 async function signin(req, reply) {
-  const registerBodySchema = import_zod10.z.object({
-    username: import_zod10.z.string(),
-    password: import_zod10.z.string()
+  const registerBodySchema = import_zod11.z.object({
+    username: import_zod11.z.string(),
+    password: import_zod11.z.string()
   });
   const { username, password } = registerBodySchema.parse(req.body);
   const signinUseCase = makeSigninUseCase();
@@ -707,9 +931,90 @@ async function signin(req, reply) {
 
 // src/http/controllers/user/routes.ts
 async function userRoutes(app2) {
-  app2.post("/user", create);
-  app2.get("/user/:id", findUser);
-  app2.post("/user/signin", signin);
+  app2.post(
+    "/user",
+    {
+      schema: {
+        tags: ["User"],
+        description: "Cria um novo usu\xE1rio",
+        body: {
+          type: "object",
+          properties: {
+            username: { type: "string" },
+            password: { type: "string" },
+            role: { type: "string", enum: ["PROFESSOR", "ALUNO"] }
+          },
+          required: ["usename", "password", "role"]
+        },
+        response: {
+          201: {
+            description: "Usu\xE1rio criado com sucesso",
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              username: { type: "string" },
+              role: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    create
+  );
+  app2.get(
+    "/user/:id",
+    {
+      schema: {
+        tags: ["User"],
+        description: "Busca um usu\xE1rio pelo ID",
+        params: {
+          type: "object",
+          properties: {
+            id: { type: "string" }
+          }
+        },
+        response: {
+          200: {
+            description: "Usu\xE1rio encontrado",
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              username: { type: "string" },
+              role: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    findUser
+  );
+  app2.post(
+    "/user/signin",
+    {
+      schema: {
+        tags: ["User"],
+        description: "Autentica\xE7\xE3o de usu\xE1rio",
+        body: {
+          type: "object",
+          properties: {
+            username: { type: "string" },
+            password: { type: "string" }
+          },
+          required: ["username", "password"]
+        },
+        response: {
+          200: {
+            description: "Login realizado com sucesso",
+            type: "object",
+            properties: {
+              token: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    signin
+  );
 }
 
 // src/repositories/typeorm/person.repository.ts
@@ -740,14 +1045,14 @@ function makeCreatePersonUseCase() {
 }
 
 // src/http/controllers/person/create-person.ts
-var import_zod11 = require("zod");
+var import_zod12 = require("zod");
 async function create2(req, reply) {
-  const registerBodySchema = import_zod11.z.object({
-    cpf: import_zod11.z.string(),
-    name: import_zod11.z.string(),
-    birth: import_zod11.z.coerce.date(),
-    email: import_zod11.z.string().email(),
-    user_id: import_zod11.z.coerce.number()
+  const registerBodySchema = import_zod12.z.object({
+    cpf: import_zod12.z.string(),
+    name: import_zod12.z.string(),
+    birth: import_zod12.z.coerce.date(),
+    email: import_zod12.z.string().email(),
+    user_id: import_zod12.z.coerce.number()
   });
   const { cpf, name, birth, email, user_id } = registerBodySchema.parse(
     req.body
@@ -765,7 +1070,37 @@ async function create2(req, reply) {
 
 // src/http/controllers/person/routes.ts
 async function personRoutes(app2) {
-  app2.post("/person", create2);
+  app2.post(
+    "/person",
+    {
+      schema: {
+        tags: ["Person"],
+        description: "Criar uma nova pessoa",
+        body: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            email: { type: "string", format: "email" },
+            cpf: { type: "string" },
+            birth_date: { type: "string", format: "date" }
+          },
+          required: ["name", "email"]
+        },
+        response: {
+          201: {
+            description: "Pessoa criada com sucesso",
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              name: { type: "string" },
+              email: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    create2
+  );
 }
 
 // src/repositories/typeorm/address.repository.ts
@@ -812,14 +1147,14 @@ function makeCreateAddressUseCase() {
 }
 
 // src/http/controllers/address/create.ts
-var import_zod12 = require("zod");
+var import_zod13 = require("zod");
 async function create3(request, reply) {
-  const registerBodySchema = import_zod12.z.object({
-    street: import_zod12.z.string(),
-    city: import_zod12.z.string(),
-    state: import_zod12.z.string(),
-    zip_code: import_zod12.z.string(),
-    person_id: import_zod12.z.coerce.number()
+  const registerBodySchema = import_zod13.z.object({
+    street: import_zod13.z.string(),
+    city: import_zod13.z.string(),
+    state: import_zod13.z.string(),
+    zip_code: import_zod13.z.string(),
+    person_id: import_zod13.z.coerce.number()
   });
   const { street, city, state, zip_code, person_id } = registerBodySchema.parse(
     request.body
@@ -861,14 +1196,14 @@ function makeFindAddressByPersonUseCase() {
 }
 
 // src/http/controllers/address/find-address.ts
-var import_zod13 = require("zod");
+var import_zod14 = require("zod");
 async function findAddress(request, reply) {
-  const registerParamsSchema = import_zod13.z.object({
-    personId: import_zod13.z.coerce.number()
+  const registerParamsSchema = import_zod14.z.object({
+    personId: import_zod14.z.coerce.number()
   });
-  const registerQuerySchema = import_zod13.z.object({
-    page: import_zod13.z.coerce.number().default(1),
-    limit: import_zod13.z.coerce.number().default(10)
+  const registerQuerySchema = import_zod14.z.object({
+    page: import_zod14.z.coerce.number().default(1),
+    limit: import_zod14.z.coerce.number().default(10)
   });
   const { personId } = registerParamsSchema.parse(request.params);
   const { page = 1, limit = 10 } = registerQuerySchema.parse(request.query);
@@ -883,13 +1218,101 @@ async function findAddress(request, reply) {
 
 // src/http/controllers/address/routes.ts
 async function addressRoutes(app2) {
-  app2.post("/address", create3);
-  app2.get("/address/person/:personId", findAddress);
+  app2.post(
+    "/address",
+    {
+      schema: {
+        tags: ["Address"],
+        description: "Cria um novo endere\xE7o para uma pessoa",
+        body: {
+          type: "object",
+          properties: {
+            street: { type: "string" },
+            city: { type: "string" },
+            state: { type: "string", minLength: 2, maxLength: 2 },
+            zip_code: { type: "string" },
+            person_id: { type: "number" }
+          },
+          required: ["street", "city", "state", "zip_code", "person_id"]
+        },
+        response: {
+          201: {
+            description: "Endere\xE7o criado com sucesso",
+            type: "object",
+            properties: {
+              id: { type: "number" },
+              street: { type: "string" },
+              city: { type: "string" }
+            }
+          }
+        }
+      }
+    },
+    create3
+  );
+  app2.get(
+    "/address/person/:personId",
+    {
+      schema: {
+        tags: ["Address"],
+        description: "Busca o endere\xE7o de uma pessoa pelo ID da pessoa",
+        params: {
+          type: "object",
+          properties: {
+            personId: { type: "string" }
+          }
+        },
+        response: {
+          200: {
+            description: "Endere\xE7o encontrado",
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                id: { type: "number" },
+                street: { type: "string" },
+                city: { type: "string" },
+                state: { type: "string" },
+                zip_code: { type: "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    findAddress
+  );
 }
 
 // src/app.ts
 var import_jwt = __toESM(require("@fastify/jwt"));
+var import_swagger = __toESM(require("@fastify/swagger"));
+var import_swagger_ui = __toESM(require("@fastify/swagger-ui"));
 var app = (0, import_fastify.default)();
+app.register(import_swagger.default, {
+  swagger: {
+    info: {
+      title: "Learn-io",
+      description: "API para gerenciamento de cursos e posts no Learn-io",
+      version: "1.0.0"
+    },
+    host: "localhost:3000",
+    schemes: ["http"],
+    consumes: ["application/json"],
+    produces: ["application/json"],
+    securityDefinitions: {
+      bearerAuth: {
+        type: "apiKey",
+        name: "Authorization",
+        in: "header",
+        description: "Digite o token no formato: Bearer [token]"
+      }
+    }
+  }
+});
+app.register(import_swagger_ui.default, {
+  routePrefix: "/docs"
+});
 app.register(import_jwt.default, {
   secret: env.JWT_SECRET,
   sign: {

@@ -32,6 +32,11 @@ export const errorHandlerMap: ErrorHandlerMap = {
       message: error.message,
     })
   },
+  DuplicateResourceError: (error, _, reply) => {
+    return reply.status(409).send({
+      message: error.message,
+    })
+  },
 }
 
 export const globalErrorHandler = (
