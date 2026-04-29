@@ -33,7 +33,7 @@ __export(make_find_address_by_person_use_case_exports, {
 module.exports = __toCommonJS(make_find_address_by_person_use_case_exports);
 
 // src/entities/person.entity.ts
-var import_typeorm3 = require("typeorm");
+var import_typeorm4 = require("typeorm");
 
 // src/entities/user.entity.ts
 var import_typeorm = require("typeorm");
@@ -95,78 +95,83 @@ __decorateClass([
   (0, import_typeorm2.Column)({ name: "person_id", type: "int" })
 ], Address.prototype, "person_id", 2);
 __decorateClass([
-  (0, import_typeorm2.ManyToOne)(() => Person),
+  (0, import_typeorm2.ManyToOne)(() => Person, (person) => person.address),
   (0, import_typeorm2.JoinColumn)({ name: "person_id" })
 ], Address.prototype, "person", 2);
 Address = __decorateClass([
   (0, import_typeorm2.Entity)({ name: "address" })
 ], Address);
 
-// src/entities/person.entity.ts
-var Person = class {
-};
-__decorateClass([
-  (0, import_typeorm3.PrimaryGeneratedColumn)("increment", { name: "id" })
-], Person.prototype, "id", 2);
-__decorateClass([
-  (0, import_typeorm3.Column)({ name: "cpf", type: "varchar" })
-], Person.prototype, "cpf", 2);
-__decorateClass([
-  (0, import_typeorm3.Column)({ name: "name", type: "varchar" })
-], Person.prototype, "name", 2);
-__decorateClass([
-  (0, import_typeorm3.Column)({ name: "birth", type: "date" })
-], Person.prototype, "birth", 2);
-__decorateClass([
-  (0, import_typeorm3.Column)({ name: "email", type: "varchar" })
-], Person.prototype, "email", 2);
-__decorateClass([
-  (0, import_typeorm3.OneToOne)(() => User, (user) => user.person),
-  (0, import_typeorm3.JoinColumn)({ name: "user_id" })
-], Person.prototype, "user_id", 2);
-__decorateClass([
-  (0, import_typeorm3.OneToOne)(() => Address, (address) => address.person)
-], Person.prototype, "address", 2);
-Person = __decorateClass([
-  (0, import_typeorm3.Entity)({ name: "person" })
-], Person);
-
 // src/entities/posts.entity.ts
-var import_typeorm4 = require("typeorm");
+var import_typeorm3 = require("typeorm");
 var Posts = class {
 };
 __decorateClass([
-  (0, import_typeorm4.PrimaryGeneratedColumn)("increment", { name: "id" })
+  (0, import_typeorm3.PrimaryGeneratedColumn)("increment", { name: "id" })
 ], Posts.prototype, "id", 2);
 __decorateClass([
-  (0, import_typeorm4.Column)({ name: "title", type: "varchar" })
+  (0, import_typeorm3.Column)({ name: "title", type: "varchar" })
 ], Posts.prototype, "title", 2);
 __decorateClass([
-  (0, import_typeorm4.Column)({ name: "content", type: "varchar" })
+  (0, import_typeorm3.Column)({ name: "content", type: "varchar" })
 ], Posts.prototype, "content", 2);
 __decorateClass([
-  (0, import_typeorm4.Column)({ name: "image_url", type: "varchar" })
+  (0, import_typeorm3.Column)({ name: "image_url", type: "varchar" })
 ], Posts.prototype, "image_url", 2);
 __decorateClass([
-  (0, import_typeorm4.Column)({ name: "author_id", type: "int" })
+  (0, import_typeorm3.Column)({ name: "author_id", type: "int" }),
+  (0, import_typeorm3.ManyToOne)(() => Person, (person) => person.posts),
+  (0, import_typeorm3.JoinColumn)({ name: "author_id" })
 ], Posts.prototype, "author_id", 2);
 __decorateClass([
-  (0, import_typeorm4.Column)({
+  (0, import_typeorm3.CreateDateColumn)({
     name: "created_at",
     type: "timestamp without time zone",
     default: () => "CURRENT_TIMESTAMP"
   })
 ], Posts.prototype, "created_at", 2);
 __decorateClass([
-  (0, import_typeorm4.Column)({
+  (0, import_typeorm3.UpdateDateColumn)({
     name: "updated_at",
     type: "timestamp without time zone",
     default: () => "CURRENT_TIMESTAMP"
   })
 ], Posts.prototype, "updated_at", 2);
 Posts = __decorateClass([
-  (0, import_typeorm4.Entity)({ name: "posts" })
+  (0, import_typeorm3.Entity)({ name: "posts" })
 ], Posts);
+
+// src/entities/person.entity.ts
+var Person = class {
+};
+__decorateClass([
+  (0, import_typeorm4.PrimaryGeneratedColumn)("increment", { name: "id" })
+], Person.prototype, "id", 2);
+__decorateClass([
+  (0, import_typeorm4.Column)({ name: "cpf", type: "varchar" })
+], Person.prototype, "cpf", 2);
+__decorateClass([
+  (0, import_typeorm4.Column)({ name: "name", type: "varchar" })
+], Person.prototype, "name", 2);
+__decorateClass([
+  (0, import_typeorm4.Column)({ name: "birth", type: "date" })
+], Person.prototype, "birth", 2);
+__decorateClass([
+  (0, import_typeorm4.Column)({ name: "email", type: "varchar" })
+], Person.prototype, "email", 2);
+__decorateClass([
+  (0, import_typeorm4.OneToOne)(() => User, (user) => user.person),
+  (0, import_typeorm4.JoinColumn)({ name: "user_id" })
+], Person.prototype, "user_id", 2);
+__decorateClass([
+  (0, import_typeorm4.OneToMany)(() => Address, (address) => address.person)
+], Person.prototype, "address", 2);
+__decorateClass([
+  (0, import_typeorm4.OneToMany)(() => Posts, (posts) => posts.author_id)
+], Person.prototype, "posts", 2);
+Person = __decorateClass([
+  (0, import_typeorm4.Entity)({ name: "person" })
+], Person);
 
 // src/env/index.ts
 var import_config = require("dotenv/config");
@@ -269,6 +274,24 @@ var AlterTablePersonUniqueCpf1777408444519 = class {
   }
 };
 
+// src/lib/typeorm/migrations/1777421308811-AlterTablePostsAddAuthorForeignKey.ts
+var AlterTablePostsAddAuthorForeignKey1777421308811 = class {
+  async up(queryRunner) {
+    await queryRunner.query(`ALTER TABLE posts
+            ADD CONSTRAINT fk_posts_author
+            FOREIGN KEY (author_id)
+            REFERENCES person(id)
+            ON DELETE RESTRICT
+            ON UPDATE CASCADE`);
+  }
+  async down(queryRunner) {
+    await queryRunner.query(`
+      ALTER TABLE posts
+      DROP CONSTRAINT IF EXISTS fk_posts_author
+    `);
+  }
+};
+
 // src/lib/typeorm/typeorm.ts
 var appDataSource = new import_typeorm5.DataSource({
   type: "postgres",
@@ -281,7 +304,8 @@ var appDataSource = new import_typeorm5.DataSource({
   migrations: [
     UserAddRole1773452300096,
     UpdateUserRoleToUppercase1773790761895,
-    AlterTablePersonUniqueCpf1777408444519
+    AlterTablePersonUniqueCpf1777408444519,
+    AlterTablePostsAddAuthorForeignKey1777421308811
   ],
   logging: env.NODE_ENV === "development"
 });

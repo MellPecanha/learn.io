@@ -17,34 +17,18 @@ var __copyProps = (to, from, except, desc) => {
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// src/useCases/create-person.ts
-var create_person_exports = {};
-__export(create_person_exports, {
-  CreatePersonUseCase: () => CreatePersonUseCase
-});
-module.exports = __toCommonJS(create_person_exports);
-
 // src/useCases/errors/duplicate-resource-error.ts
+var duplicate_resource_error_exports = {};
+__export(duplicate_resource_error_exports, {
+  DuplicateResourceError: () => DuplicateResourceError
+});
+module.exports = __toCommonJS(duplicate_resource_error_exports);
 var DuplicateResourceError = class extends Error {
   constructor() {
     super("CPF j\xE1 cadastrado");
   }
 };
-
-// src/useCases/create-person.ts
-var CreatePersonUseCase = class {
-  constructor(personRepository) {
-    this.personRepository = personRepository;
-  }
-  async execute(person) {
-    const existingPerson = await this.personRepository.findByCpf(person.cpf);
-    if (existingPerson) {
-      throw new DuplicateResourceError();
-    }
-    return this.personRepository.create(person);
-  }
-};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  CreatePersonUseCase
+  DuplicateResourceError
 });

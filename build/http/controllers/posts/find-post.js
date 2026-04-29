@@ -33,50 +33,13 @@ __export(find_post_exports, {
 module.exports = __toCommonJS(find_post_exports);
 
 // src/entities/posts.entity.ts
-var import_typeorm = require("typeorm");
-var Posts = class {
-};
-__decorateClass([
-  (0, import_typeorm.PrimaryGeneratedColumn)("increment", { name: "id" })
-], Posts.prototype, "id", 2);
-__decorateClass([
-  (0, import_typeorm.Column)({ name: "title", type: "varchar" })
-], Posts.prototype, "title", 2);
-__decorateClass([
-  (0, import_typeorm.Column)({ name: "content", type: "varchar" })
-], Posts.prototype, "content", 2);
-__decorateClass([
-  (0, import_typeorm.Column)({ name: "image_url", type: "varchar" })
-], Posts.prototype, "image_url", 2);
-__decorateClass([
-  (0, import_typeorm.Column)({ name: "author_id", type: "int" })
-], Posts.prototype, "author_id", 2);
-__decorateClass([
-  (0, import_typeorm.Column)({
-    name: "created_at",
-    type: "timestamp without time zone",
-    default: () => "CURRENT_TIMESTAMP"
-  })
-], Posts.prototype, "created_at", 2);
-__decorateClass([
-  (0, import_typeorm.Column)({
-    name: "updated_at",
-    type: "timestamp without time zone",
-    default: () => "CURRENT_TIMESTAMP"
-  })
-], Posts.prototype, "updated_at", 2);
-Posts = __decorateClass([
-  (0, import_typeorm.Entity)({ name: "posts" })
-], Posts);
-
-// src/repositories/typeorm/posts.repository.ts
-var import_typeorm6 = require("typeorm");
-
-// src/entities/person.entity.ts
 var import_typeorm4 = require("typeorm");
 
+// src/entities/person.entity.ts
+var import_typeorm3 = require("typeorm");
+
 // src/entities/user.entity.ts
-var import_typeorm2 = require("typeorm");
+var import_typeorm = require("typeorm");
 
 // src/entities/enums/user-role.ts
 var UserRole = /* @__PURE__ */ ((UserRole2) => {
@@ -89,16 +52,16 @@ var UserRole = /* @__PURE__ */ ((UserRole2) => {
 var User = class {
 };
 __decorateClass([
-  (0, import_typeorm2.PrimaryGeneratedColumn)("increment", { name: "id" })
+  (0, import_typeorm.PrimaryGeneratedColumn)("increment", { name: "id" })
 ], User.prototype, "id", 2);
 __decorateClass([
-  (0, import_typeorm2.Column)({ name: "username", type: "varchar" })
+  (0, import_typeorm.Column)({ name: "username", type: "varchar" })
 ], User.prototype, "username", 2);
 __decorateClass([
-  (0, import_typeorm2.Column)({ name: "password", type: "varchar" })
+  (0, import_typeorm.Column)({ name: "password", type: "varchar" })
 ], User.prototype, "password", 2);
 __decorateClass([
-  (0, import_typeorm2.Column)({
+  (0, import_typeorm.Column)({
     name: "role",
     type: "enum",
     enum: UserRole,
@@ -106,70 +69,114 @@ __decorateClass([
   })
 ], User.prototype, "role", 2);
 __decorateClass([
-  (0, import_typeorm2.OneToOne)(() => Person, (person) => person.user_id)
+  (0, import_typeorm.OneToOne)(() => Person, (person) => person.user_id)
 ], User.prototype, "person", 2);
 User = __decorateClass([
-  (0, import_typeorm2.Entity)({ name: "user" })
+  (0, import_typeorm.Entity)({ name: "user" })
 ], User);
 
 // src/entities/address.ts
-var import_typeorm3 = require("typeorm");
+var import_typeorm2 = require("typeorm");
 var Address = class {
 };
 __decorateClass([
-  (0, import_typeorm3.PrimaryGeneratedColumn)("increment", { name: "id" })
+  (0, import_typeorm2.PrimaryGeneratedColumn)("increment", { name: "id" })
 ], Address.prototype, "id", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({ name: "street", type: "varchar" })
+  (0, import_typeorm2.Column)({ name: "street", type: "varchar" })
 ], Address.prototype, "street", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({ name: "city", type: "varchar" })
+  (0, import_typeorm2.Column)({ name: "city", type: "varchar" })
 ], Address.prototype, "city", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({ name: "state", type: "varchar" })
+  (0, import_typeorm2.Column)({ name: "state", type: "varchar" })
 ], Address.prototype, "state", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({ name: "zip_code", type: "varchar" })
+  (0, import_typeorm2.Column)({ name: "zip_code", type: "varchar" })
 ], Address.prototype, "zip_code", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({ name: "person_id", type: "int" })
+  (0, import_typeorm2.Column)({ name: "person_id", type: "int" })
 ], Address.prototype, "person_id", 2);
 __decorateClass([
-  (0, import_typeorm3.ManyToOne)(() => Person),
-  (0, import_typeorm3.JoinColumn)({ name: "person_id" })
+  (0, import_typeorm2.ManyToOne)(() => Person, (person) => person.address),
+  (0, import_typeorm2.JoinColumn)({ name: "person_id" })
 ], Address.prototype, "person", 2);
 Address = __decorateClass([
-  (0, import_typeorm3.Entity)({ name: "address" })
+  (0, import_typeorm2.Entity)({ name: "address" })
 ], Address);
 
 // src/entities/person.entity.ts
 var Person = class {
 };
 __decorateClass([
-  (0, import_typeorm4.PrimaryGeneratedColumn)("increment", { name: "id" })
+  (0, import_typeorm3.PrimaryGeneratedColumn)("increment", { name: "id" })
 ], Person.prototype, "id", 2);
 __decorateClass([
-  (0, import_typeorm4.Column)({ name: "cpf", type: "varchar" })
+  (0, import_typeorm3.Column)({ name: "cpf", type: "varchar" })
 ], Person.prototype, "cpf", 2);
 __decorateClass([
-  (0, import_typeorm4.Column)({ name: "name", type: "varchar" })
+  (0, import_typeorm3.Column)({ name: "name", type: "varchar" })
 ], Person.prototype, "name", 2);
 __decorateClass([
-  (0, import_typeorm4.Column)({ name: "birth", type: "date" })
+  (0, import_typeorm3.Column)({ name: "birth", type: "date" })
 ], Person.prototype, "birth", 2);
 __decorateClass([
-  (0, import_typeorm4.Column)({ name: "email", type: "varchar" })
+  (0, import_typeorm3.Column)({ name: "email", type: "varchar" })
 ], Person.prototype, "email", 2);
 __decorateClass([
-  (0, import_typeorm4.OneToOne)(() => User, (user) => user.person),
-  (0, import_typeorm4.JoinColumn)({ name: "user_id" })
+  (0, import_typeorm3.OneToOne)(() => User, (user) => user.person),
+  (0, import_typeorm3.JoinColumn)({ name: "user_id" })
 ], Person.prototype, "user_id", 2);
 __decorateClass([
-  (0, import_typeorm4.OneToOne)(() => Address, (address) => address.person)
+  (0, import_typeorm3.OneToMany)(() => Address, (address) => address.person)
 ], Person.prototype, "address", 2);
+__decorateClass([
+  (0, import_typeorm3.OneToMany)(() => Posts, (posts) => posts.author_id)
+], Person.prototype, "posts", 2);
 Person = __decorateClass([
-  (0, import_typeorm4.Entity)({ name: "person" })
+  (0, import_typeorm3.Entity)({ name: "person" })
 ], Person);
+
+// src/entities/posts.entity.ts
+var Posts = class {
+};
+__decorateClass([
+  (0, import_typeorm4.PrimaryGeneratedColumn)("increment", { name: "id" })
+], Posts.prototype, "id", 2);
+__decorateClass([
+  (0, import_typeorm4.Column)({ name: "title", type: "varchar" })
+], Posts.prototype, "title", 2);
+__decorateClass([
+  (0, import_typeorm4.Column)({ name: "content", type: "varchar" })
+], Posts.prototype, "content", 2);
+__decorateClass([
+  (0, import_typeorm4.Column)({ name: "image_url", type: "varchar" })
+], Posts.prototype, "image_url", 2);
+__decorateClass([
+  (0, import_typeorm4.Column)({ name: "author_id", type: "int" }),
+  (0, import_typeorm4.ManyToOne)(() => Person, (person) => person.posts),
+  (0, import_typeorm4.JoinColumn)({ name: "author_id" })
+], Posts.prototype, "author_id", 2);
+__decorateClass([
+  (0, import_typeorm4.CreateDateColumn)({
+    name: "created_at",
+    type: "timestamp without time zone",
+    default: () => "CURRENT_TIMESTAMP"
+  })
+], Posts.prototype, "created_at", 2);
+__decorateClass([
+  (0, import_typeorm4.UpdateDateColumn)({
+    name: "updated_at",
+    type: "timestamp without time zone",
+    default: () => "CURRENT_TIMESTAMP"
+  })
+], Posts.prototype, "updated_at", 2);
+Posts = __decorateClass([
+  (0, import_typeorm4.Entity)({ name: "posts" })
+], Posts);
+
+// src/repositories/typeorm/posts.repository.ts
+var import_typeorm6 = require("typeorm");
 
 // src/env/index.ts
 var import_config = require("dotenv/config");
@@ -272,6 +279,24 @@ var AlterTablePersonUniqueCpf1777408444519 = class {
   }
 };
 
+// src/lib/typeorm/migrations/1777421308811-AlterTablePostsAddAuthorForeignKey.ts
+var AlterTablePostsAddAuthorForeignKey1777421308811 = class {
+  async up(queryRunner) {
+    await queryRunner.query(`ALTER TABLE posts
+            ADD CONSTRAINT fk_posts_author
+            FOREIGN KEY (author_id)
+            REFERENCES person(id)
+            ON DELETE RESTRICT
+            ON UPDATE CASCADE`);
+  }
+  async down(queryRunner) {
+    await queryRunner.query(`
+      ALTER TABLE posts
+      DROP CONSTRAINT IF EXISTS fk_posts_author
+    `);
+  }
+};
+
 // src/lib/typeorm/typeorm.ts
 var appDataSource = new import_typeorm5.DataSource({
   type: "postgres",
@@ -284,7 +309,8 @@ var appDataSource = new import_typeorm5.DataSource({
   migrations: [
     UserAddRole1773452300096,
     UpdateUserRoleToUppercase1773790761895,
-    AlterTablePersonUniqueCpf1777408444519
+    AlterTablePersonUniqueCpf1777408444519,
+    AlterTablePostsAddAuthorForeignKey1777421308811
   ],
   logging: env.NODE_ENV === "development"
 });
@@ -301,12 +327,14 @@ var PostsRepository = class {
   }
   async findAll(page, limit) {
     return this.repository.find({
+      relations: ["author_id"],
       skip: (page - 1) * limit,
       take: limit
     });
   }
   async findById(id) {
     return this.repository.findOne({
+      relations: ["author_id"],
       where: {
         id
       }
@@ -314,6 +342,7 @@ var PostsRepository = class {
   }
   async search(query) {
     return this.repository.find({
+      relations: ["author_id"],
       where: [
         { title: (0, import_typeorm6.ILike)(`%${query}%`) },
         // Busca no título

@@ -17,34 +17,29 @@ var __copyProps = (to, from, except, desc) => {
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// src/useCases/create-person.ts
-var create_person_exports = {};
-__export(create_person_exports, {
-  CreatePersonUseCase: () => CreatePersonUseCase
+// src/lib/typeorm/migrations/1777421308811-AlterTablePostsAddAuthorForeignKey.ts
+var AlterTablePostsAddAuthorForeignKey_exports = {};
+__export(AlterTablePostsAddAuthorForeignKey_exports, {
+  AlterTablePostsAddAuthorForeignKey1777421308811: () => AlterTablePostsAddAuthorForeignKey1777421308811
 });
-module.exports = __toCommonJS(create_person_exports);
-
-// src/useCases/errors/duplicate-resource-error.ts
-var DuplicateResourceError = class extends Error {
-  constructor() {
-    super("CPF j\xE1 cadastrado");
+module.exports = __toCommonJS(AlterTablePostsAddAuthorForeignKey_exports);
+var AlterTablePostsAddAuthorForeignKey1777421308811 = class {
+  async up(queryRunner) {
+    await queryRunner.query(`ALTER TABLE posts
+            ADD CONSTRAINT fk_posts_author
+            FOREIGN KEY (author_id)
+            REFERENCES person(id)
+            ON DELETE RESTRICT
+            ON UPDATE CASCADE`);
   }
-};
-
-// src/useCases/create-person.ts
-var CreatePersonUseCase = class {
-  constructor(personRepository) {
-    this.personRepository = personRepository;
-  }
-  async execute(person) {
-    const existingPerson = await this.personRepository.findByCpf(person.cpf);
-    if (existingPerson) {
-      throw new DuplicateResourceError();
-    }
-    return this.personRepository.create(person);
+  async down(queryRunner) {
+    await queryRunner.query(`
+      ALTER TABLE posts
+      DROP CONSTRAINT IF EXISTS fk_posts_author
+    `);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  CreatePersonUseCase
+  AlterTablePostsAddAuthorForeignKey1777421308811
 });

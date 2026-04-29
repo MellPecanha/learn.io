@@ -2,12 +2,14 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import { IPerson } from './models/person.interface'
 import { User } from './user.entity'
 import { Address } from './address'
+import { Posts } from './posts.entity'
 
 @Entity({ name: 'person' })
 export class Person implements IPerson {
@@ -30,6 +32,9 @@ export class Person implements IPerson {
   @JoinColumn({ name: 'user_id' })
   user_id?: number
 
-  @OneToOne(() => Address, (address) => address.person)
+  @OneToMany(() => Address, (address) => address.person)
   address?: Address
+
+  @OneToMany(() => Posts, (posts) => posts.author_id)
+  posts?: Posts[]
 }

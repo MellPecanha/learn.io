@@ -1,5 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 import { IPosts } from './models/posts.interface'
+import { Person } from './person.entity'
 
 @Entity({ name: 'posts' })
 export class Posts implements IPosts {
@@ -16,16 +25,18 @@ export class Posts implements IPosts {
   image_url: string
 
   @Column({ name: 'author_id', type: 'int' })
-  author_id?: number
+  @ManyToOne(() => Person, (person) => person.posts)
+  @JoinColumn({ name: 'author_id' })
+  author_id?: Person
 
-  @Column({
+  @CreateDateColumn({
     name: 'created_at',
     type: 'timestamp without time zone',
     default: () => 'CURRENT_TIMESTAMP',
   })
   created_at?: Date
 
-  @Column({
+  @UpdateDateColumn({
     name: 'updated_at',
     type: 'timestamp without time zone',
     default: () => 'CURRENT_TIMESTAMP',

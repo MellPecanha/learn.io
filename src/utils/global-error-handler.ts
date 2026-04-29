@@ -37,6 +37,11 @@ export const errorHandlerMap: ErrorHandlerMap = {
       message: error.message,
     })
   },
+  InvalidRelationError: (error, _, reply) => {
+    return reply.status(400).send({
+      message: error.message,
+    })
+  },
 }
 
 export const globalErrorHandler = (
