@@ -68,6 +68,11 @@ var errorHandlerMap = {
     return reply.status(403).send({
       message: error.message
     });
+  },
+  DuplicateResourceError: (error, _, reply) => {
+    return reply.status(409).send({
+      message: error.message
+    });
   }
 };
 var globalErrorHandler = (error, _, reply) => {

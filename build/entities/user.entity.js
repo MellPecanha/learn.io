@@ -31,10 +31,10 @@ __export(user_entity_exports, {
   User: () => User
 });
 module.exports = __toCommonJS(user_entity_exports);
-var import_typeorm3 = require("typeorm");
+var import_typeorm4 = require("typeorm");
 
 // src/entities/person.entity.ts
-var import_typeorm2 = require("typeorm");
+var import_typeorm3 = require("typeorm");
 
 // src/entities/address.ts
 var import_typeorm = require("typeorm");
@@ -59,40 +59,82 @@ __decorateClass([
   (0, import_typeorm.Column)({ name: "person_id", type: "int" })
 ], Address.prototype, "person_id", 2);
 __decorateClass([
-  (0, import_typeorm.ManyToOne)(() => Person),
+  (0, import_typeorm.ManyToOne)(() => Person, (person) => person.address),
   (0, import_typeorm.JoinColumn)({ name: "person_id" })
 ], Address.prototype, "person", 2);
 Address = __decorateClass([
   (0, import_typeorm.Entity)({ name: "address" })
 ], Address);
 
+// src/entities/posts.entity.ts
+var import_typeorm2 = require("typeorm");
+var Posts = class {
+};
+__decorateClass([
+  (0, import_typeorm2.PrimaryGeneratedColumn)("increment", { name: "id" })
+], Posts.prototype, "id", 2);
+__decorateClass([
+  (0, import_typeorm2.Column)({ name: "title", type: "varchar" })
+], Posts.prototype, "title", 2);
+__decorateClass([
+  (0, import_typeorm2.Column)({ name: "content", type: "varchar" })
+], Posts.prototype, "content", 2);
+__decorateClass([
+  (0, import_typeorm2.Column)({ name: "image_url", type: "varchar" })
+], Posts.prototype, "image_url", 2);
+__decorateClass([
+  (0, import_typeorm2.Column)({ name: "author_id", type: "int" }),
+  (0, import_typeorm2.ManyToOne)(() => Person, (person) => person.posts),
+  (0, import_typeorm2.JoinColumn)({ name: "author_id" })
+], Posts.prototype, "author_id", 2);
+__decorateClass([
+  (0, import_typeorm2.CreateDateColumn)({
+    name: "created_at",
+    type: "timestamp without time zone",
+    default: () => "CURRENT_TIMESTAMP"
+  })
+], Posts.prototype, "created_at", 2);
+__decorateClass([
+  (0, import_typeorm2.UpdateDateColumn)({
+    name: "updated_at",
+    type: "timestamp without time zone",
+    default: () => "CURRENT_TIMESTAMP"
+  })
+], Posts.prototype, "updated_at", 2);
+Posts = __decorateClass([
+  (0, import_typeorm2.Entity)({ name: "posts" })
+], Posts);
+
 // src/entities/person.entity.ts
 var Person = class {
 };
 __decorateClass([
-  (0, import_typeorm2.PrimaryGeneratedColumn)("increment", { name: "id" })
+  (0, import_typeorm3.PrimaryGeneratedColumn)("increment", { name: "id" })
 ], Person.prototype, "id", 2);
 __decorateClass([
-  (0, import_typeorm2.Column)({ name: "cpf", type: "varchar" })
+  (0, import_typeorm3.Column)({ name: "cpf", type: "varchar" })
 ], Person.prototype, "cpf", 2);
 __decorateClass([
-  (0, import_typeorm2.Column)({ name: "name", type: "varchar" })
+  (0, import_typeorm3.Column)({ name: "name", type: "varchar" })
 ], Person.prototype, "name", 2);
 __decorateClass([
-  (0, import_typeorm2.Column)({ name: "birth", type: "date" })
+  (0, import_typeorm3.Column)({ name: "birth", type: "date" })
 ], Person.prototype, "birth", 2);
 __decorateClass([
-  (0, import_typeorm2.Column)({ name: "email", type: "varchar" })
+  (0, import_typeorm3.Column)({ name: "email", type: "varchar" })
 ], Person.prototype, "email", 2);
 __decorateClass([
-  (0, import_typeorm2.OneToOne)(() => User, (user) => user.person),
-  (0, import_typeorm2.JoinColumn)({ name: "user_id" })
+  (0, import_typeorm3.OneToOne)(() => User, (user) => user.person),
+  (0, import_typeorm3.JoinColumn)({ name: "user_id" })
 ], Person.prototype, "user_id", 2);
 __decorateClass([
-  (0, import_typeorm2.OneToOne)(() => Address, (address) => address.person)
+  (0, import_typeorm3.OneToMany)(() => Address, (address) => address.person)
 ], Person.prototype, "address", 2);
+__decorateClass([
+  (0, import_typeorm3.OneToMany)(() => Posts, (posts) => posts.author_id)
+], Person.prototype, "posts", 2);
 Person = __decorateClass([
-  (0, import_typeorm2.Entity)({ name: "person" })
+  (0, import_typeorm3.Entity)({ name: "person" })
 ], Person);
 
 // src/entities/enums/user-role.ts
@@ -106,16 +148,16 @@ var UserRole = /* @__PURE__ */ ((UserRole2) => {
 var User = class {
 };
 __decorateClass([
-  (0, import_typeorm3.PrimaryGeneratedColumn)("increment", { name: "id" })
+  (0, import_typeorm4.PrimaryGeneratedColumn)("increment", { name: "id" })
 ], User.prototype, "id", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({ name: "username", type: "varchar" })
+  (0, import_typeorm4.Column)({ name: "username", type: "varchar" })
 ], User.prototype, "username", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({ name: "password", type: "varchar" })
+  (0, import_typeorm4.Column)({ name: "password", type: "varchar" })
 ], User.prototype, "password", 2);
 __decorateClass([
-  (0, import_typeorm3.Column)({
+  (0, import_typeorm4.Column)({
     name: "role",
     type: "enum",
     enum: UserRole,
@@ -123,10 +165,10 @@ __decorateClass([
   })
 ], User.prototype, "role", 2);
 __decorateClass([
-  (0, import_typeorm3.OneToOne)(() => Person, (person) => person.user_id)
+  (0, import_typeorm4.OneToOne)(() => Person, (person) => person.user_id)
 ], User.prototype, "person", 2);
 User = __decorateClass([
-  (0, import_typeorm3.Entity)({ name: "user" })
+  (0, import_typeorm4.Entity)({ name: "user" })
 ], User);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

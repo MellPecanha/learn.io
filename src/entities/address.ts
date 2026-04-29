@@ -28,7 +28,7 @@ export class Address implements IAddress {
   @Column({ name: 'person_id', type: 'int' })
   person_id: number
 
-  @ManyToOne(() => Person)
+  @ManyToOne(() => Person, (person) => person.address)
   @JoinColumn({ name: 'person_id' })
   person?: Person
 }
