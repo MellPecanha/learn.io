@@ -4,7 +4,7 @@ export async function validateJwt(req: FastifyRequest, reply: FastifyReply) {
   try {
     if (req.url.startsWith('/docs')) return
 
-    const routeFreeList = ['POST-/user', 'POST-/user/signin']
+    const routeFreeList = ['POST-/user', 'POST-/user/signin', 'POST-/person']
     const validateRoute = `${req.method}-${req.routeOptions.url}`
 
     if (routeFreeList.includes(validateRoute)) return

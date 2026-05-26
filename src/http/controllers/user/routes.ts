@@ -17,7 +17,7 @@ export async function userRoutes(app: FastifyInstance) {
             password: { type: 'string' },
             role: { type: 'string', enum: ['PROFESSOR', 'ALUNO'] },
           },
-          required: ['usename', 'password', 'role'],
+          required: ['username', 'password', 'role'],
         },
         response: {
           201: {
