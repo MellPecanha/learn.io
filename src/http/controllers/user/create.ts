@@ -9,7 +9,7 @@ export async function create(req: FastifyRequest, reply: FastifyReply) {
     username: z.string(),
     password: z.string(),
     role: z
-      .enum([UserRole.ALUNO, UserRole.PROFESSOR])
+      .enum([UserRole.ALUNO, UserRole.PROFESSOR, 'aluno', 'professor'])
       .default(UserRole.ALUNO)
       .transform((role) => role.toUpperCase()),
   })

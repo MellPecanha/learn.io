@@ -15,7 +15,10 @@ export async function userRoutes(app: FastifyInstance) {
           properties: {
             username: { type: 'string' },
             password: { type: 'string' },
-            role: { type: 'string', enum: ['PROFESSOR', 'ALUNO'] },
+            role: {
+              type: 'string',
+              enum: ['PROFESSOR', 'ALUNO', 'professor', 'aluno'],
+            },
           },
           required: ['username', 'password', 'role'],
         },
