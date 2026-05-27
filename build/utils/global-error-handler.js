@@ -73,6 +73,11 @@ var errorHandlerMap = {
     return reply.status(409).send({
       message: error.message
     });
+  },
+  InvalidRelationError: (error, _, reply) => {
+    return reply.status(400).send({
+      message: error.message
+    });
   }
 };
 var globalErrorHandler = (error, _, reply) => {

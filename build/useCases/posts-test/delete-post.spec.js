@@ -17221,6 +17221,8 @@ SOURCEMAPPING_URL += "ppingURL";
 var isWindows = typeof process < "u" && process.platform === "win32";
 var AsyncFunction = async function() {
 }.constructor;
+var textDecoder = new TextDecoder();
+var decodeBase64 = typeof Buffer == "function" && typeof Buffer.from == "function" ? (base64) => Buffer.from(base64, "base64").toString("utf-8") : (base64) => textDecoder.decode(Uint8Array.from(atob(base64), (c) => c.charCodeAt(0)));
 var chars3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 var intToChar3 = new Uint8Array(64);
 var charToInt3 = new Uint8Array(128);
@@ -17255,7 +17257,6 @@ export async function resolve(specifier, context, nextResolve) {
 }
 
 `;
-`${customizationHookNamespace}`;
 var envProxy = new Proxy({}, { get(_, p) {
   throw Error(`[module runner] Dynamic access of "import.meta.env" is not supported. Please, use "import.meta.env.${String(p)}" instead.`);
 } });

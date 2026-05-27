@@ -15,7 +15,7 @@ export async function updatePosts(
   const registerBodySchema = z.object({
     title: z.string(),
     content: z.string(),
-    image_url: z.string(),
+    image_url: z.string().optional(),
     author_id: z.number().optional(),
   })
 

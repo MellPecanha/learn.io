@@ -124,6 +124,7 @@ export async function postsRoutes(app: FastifyInstance) {
   app.delete(
     '/posts/:id',
     {
+      preHandler: [validateJwt],
       schema: {
         tags: ['Posts'],
         description: 'Remove um post',

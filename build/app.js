@@ -357,6 +357,11 @@ var errorHandlerMap = {
     return reply.status(409).send({
       message: error.message
     });
+  },
+  InvalidRelationError: (error, _, reply) => {
+    return reply.status(400).send({
+      message: error.message
+    });
   }
 };
 var globalErrorHandler = (error, _, reply) => {
@@ -372,9 +377,37 @@ var globalErrorHandler = (error, _, reply) => {
 
 // src/repositories/typeorm/posts.repository.ts
 var import_typeorm6 = require("typeorm");
+
+// src/useCases/errors/invalid-relation-error.ts
+var InvalidRelationError = class extends Error {
+  constructor() {
+    super("Invalid relation error");
+  }
+};
+
+// src/repositories/typeorm/posts.repository.ts
 var PostsRepository = class {
   constructor() {
     this.repository = appDataSource.getRepository(Posts);
+    this.personRepository = appDataSource.getRepository(Person);
+  }
+  getAuthorId(author) {
+    if (!author) return void 0;
+    if (typeof author === "number") {
+      return author;
+    }
+    return author.id;
+  }
+  async validateAuthorExists(author) {
+    const authorId = this.getAuthorId(author);
+    if (!authorId) return void 0;
+    const existingAuthor = await this.personRepository.findOne({
+      where: { id: authorId }
+    });
+    if (!existingAuthor) {
+      throw new InvalidRelationError();
+    }
+    return authorId;
   }
   async findAll(page, limit) {
     return this.repository.find({
@@ -403,12 +436,20 @@ var PostsRepository = class {
     });
   }
   async create(posts) {
-    return this.repository.save(posts);
+    const authorId = await this.validateAuthorExists(posts.author_id);
+    return await this.repository.save({
+      ...posts,
+      author_id: authorId
+    });
   }
   async update(posts) {
     const post = await this.findById(posts.id);
     const updatedPost = this.repository.merge(post, posts);
-    return this.repository.save(updatedPost);
+    const authorId = await this.validateAuthorExists(updatedPost.author_id);
+    return await this.repository.save({
+      ...updatedPost,
+      author_id: authorId
+    });
   }
   async delete(id) {
     await this.repository.delete(id);
@@ -643,7 +684,7 @@ async function deletePost(req, reply) {
 async function validateJwt(req, reply) {
   try {
     if (req.url.startsWith("/docs")) return;
-    const routeFreeList = ["POST-/user", "POST-/user/signin"];
+    const routeFreeList = ["POST-/user", "POST-/user/signin", "POST-/person"];
     const validateRoute = `${req.method}-${req.routeOptions.url}`;
     if (routeFreeList.includes(validateRoute)) return;
     await req.jwtVerify();
@@ -986,7 +1027,7 @@ async function userRoutes(app2) {
             password: { type: "string" },
             role: { type: "string", enum: ["PROFESSOR", "ALUNO"] }
           },
-          required: ["usename", "password", "role"]
+          required: ["username", "password", "role"]
         },
         response: {
           201: {
