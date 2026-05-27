@@ -6,7 +6,7 @@ export async function createPost(request: FastifyRequest, reply: FastifyReply) {
   const registerPostBodySchema = z.object({
     title: z.string(),
     content: z.string(),
-    image_url: z.string(),
+    image_url: z.string().optional(),
     author_id: z.number(),
   })
 
@@ -22,7 +22,7 @@ export async function createPost(request: FastifyRequest, reply: FastifyReply) {
     {
       title,
       content,
-      image_url,
+      image_url: image_url ?? '',
       author_id,
     },
     user.role,

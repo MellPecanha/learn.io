@@ -17,24 +17,18 @@ var __copyProps = (to, from, except, desc) => {
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// src/http/middlewares/jwt-validate.ts
-var jwt_validate_exports = {};
-__export(jwt_validate_exports, {
-  validateJwt: () => validateJwt
+// src/useCases/errors/invalid-relation-error.ts
+var invalid_relation_error_exports = {};
+__export(invalid_relation_error_exports, {
+  InvalidRelationError: () => InvalidRelationError
 });
-module.exports = __toCommonJS(jwt_validate_exports);
-async function validateJwt(req, reply) {
-  try {
-    if (req.url.startsWith("/docs")) return;
-    const routeFreeList = ["POST-/user", "POST-/user/signin", "POST-/person"];
-    const validateRoute = `${req.method}-${req.routeOptions.url}`;
-    if (routeFreeList.includes(validateRoute)) return;
-    await req.jwtVerify();
-  } catch (error) {
-    reply.status(401).send({ message: "Unauthorized" });
+module.exports = __toCommonJS(invalid_relation_error_exports);
+var InvalidRelationError = class extends Error {
+  constructor() {
+    super("Invalid relation error");
   }
-}
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  validateJwt
+  InvalidRelationError
 });

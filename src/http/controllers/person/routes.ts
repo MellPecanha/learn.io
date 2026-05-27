@@ -1,5 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import { create } from './create-person'
+import { findPersonByUser } from './find-person-by-user'
+import { validateJwt } from '@/http/middlewares/jwt-validate'
 
 export async function personRoutes(app: FastifyInstance) {
   app.post(
@@ -32,5 +34,17 @@ export async function personRoutes(app: FastifyInstance) {
       },
     },
     create,
+  )
+
+  app.get(
+    '/person/me',
+    {
+      preHandler: [validateJwt],
+      schema: {
+        tags: ['Person'],
+        description: 'Retorna a Person vinculada ao usuário autenticado',
+      },
+    },
+    findPersonByUser,
   )
 }
