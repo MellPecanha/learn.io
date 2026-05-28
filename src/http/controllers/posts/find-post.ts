@@ -15,5 +15,10 @@ export async function findPost(request: FastifyRequest, reply: FastifyReply) {
 
   const post = await findPostUseCase.execute(id, user.role)
 
-  return reply.status(200).send(post)
+  // include author_name for frontend convenience
+  const mapped = post
+    ? { ...post, author_name: (post.author_id as any)?.name ?? undefined }
+    : post
+
+  return reply.status(200).send(mapped)
 }

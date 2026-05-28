@@ -17,5 +17,11 @@ export async function findAllPosts(
 
   const findAllPostsUseCase = makeFindAllPostsUseCase()
   const posts = await findAllPostsUseCase.execute(page, limit, user.role)
-  return reply.status(200).send(posts)
+  // map author relation to a friendlier field for the frontend
+  const mapped = posts.map((p) => ({
+    ...p,
+    author_name: (p.author_id as any)?.name ?? undefined,
+  }))
+
+  return reply.status(200).send(mapped)
 }
